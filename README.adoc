@@ -1,0 +1,143 @@
+= VQL-UT (VQL Ultimate Type-Safe)
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:spdx: PMPL-1.0-or-later
+:status: Pre-Alpha
+:toc: preamble
+:icons: font
+
+== Overview
+
+VQL-UT is the next-generation query language for https://github.com/hyperpolymath/nextgen-databases[VeriSimDB], designed to satisfy **all 10 levels of type safety** — the 6 established IO-covered forms and the 4 additional forms identified through our research.
+
+The goal is production-worthy VQL that is provably correct at every layer, from parse to execution. At minimum, this repo serves as a research vehicle for exploring the boundaries of type-safe query languages.
+
+Formerly known as *vql++*.
+
+== The 10 Levels of Type Safety
+
+=== Established (IO-Covered) — 6 Levels
+
+[cols="1,2,3"]
+|===
+| Level | Name | Description
+
+| 1 | **Parse-time safety** | Query syntax verified at parse time — malformed queries rejected before processing
+| 2 | **Schema-binding safety** | Column names, table references, relationships validated against live schema
+| 3 | **Type-compatible operations** | Arithmetic, comparison, aggregation only on compatible types
+| 4 | **Null-safety** | Nullable vs non-nullable tracked through joins, subqueries, projections
+| 5 | **Injection-proof safety** | Parameterised queries enforced at type level — interpolation impossible by construction
+| 6 | **Result-type safety** | Query return types known at compile time — no runtime casting
+|===
+
+=== Research-Identified — 4 Additional Levels
+
+[cols="1,2,3"]
+|===
+| Level | Name | Description
+
+| 7 | **Cardinality safety** | Return count guarantees (exactly-one, at-most-one, many) in the type system
+| 8 | **Effect-tracking safety** | Read vs write vs DDL distinguished at type level — pure queries cannot mutate
+| 9 | **Temporal safety** | Bi-temporal and system-time queries carry time bounds in types — prevents stale reads
+| 10 | **Linearity safety** | Connection and transaction handles are linear types — use-after-close impossible
+|===
+
+== Architecture
+
+[source]
+----
+                        +---------------+
+                        |  VQL Source   |
+                        +-------+-------+
+                                |
+                    +-----------v-----------+
+                    |  Parser (Level 1)     |  Idris2 -- total, proven grammar
+                    +-----------+-----------+
+                                |
+                    +-----------v-----------+
+                    |  Schema Binder (2)    |  Idris2 -- dependent types on schema
+                    +-----------+-----------+
+                                |
+                    +-----------v-----------+
+                    |  Type Checker (3-6)   |  Idris2 -- nullability, injection, results
+                    +-----------+-----------+
+                                |
+                    +-----------v-----------+
+                    |  Effect Analyser      |  Idris2 -- cardinality (7), effects (8),
+                    |  (7-10)               |           temporality (9), linearity (10)
+                    +-----------+-----------+
+                                |
+                    +-----------v-----------+
+                    |  Zig FFI Codegen      |  Compiles to C-ABI query plan
+                    +-----------+-----------+
+                                |
+                    +-----------v-----------+
+                    |  VeriSimDB Engine     |  6-modal execution
+                    +-----------------------+
+----
+
+== Technology Stack
+
+[cols="1,1,2"]
+|===
+| Layer | Language | Purpose
+
+| Core type system | Idris2 | Dependent types for all 10 safety levels. %default total.
+| FFI bridge | Zig | C-ABI query plan compilation. Zero-copy result sets.
+| API layer | V-lang | REST/gRPC/GraphQL endpoints for query submission.
+| Client bindings | ReScript | Type-safe browser/Node client with compile-time query validation.
+| VeriSimDB integration | Elixir | 6-modal storage engine connection via NIFs.
+|===
+
+== Roadmap
+
+=== Phase 1 — Foundation (Levels 1-3)
+- [ ] VQL grammar specification (EBNF)
+- [ ] Idris2 parser with totality proof
+- [ ] Schema representation as dependent types
+- [ ] Type-compatible operation checker
+- [ ] Zig FFI for query plan emission
+- [ ] Basic test suite against VeriSimDB
+
+=== Phase 2 — Safety Core (Levels 4-6)
+- [ ] Null-tracking through join algebra
+- [ ] Injection-proof parameterisation (type-level enforcement)
+- [ ] Result-type inference with compile-time guarantees
+- [ ] Property-based tests (QuickCheck/Hedgehog)
+
+=== Phase 3 — Research Levels (Levels 7-10)
+- [ ] Cardinality annotations and inference
+- [ ] Effect system (Read/Write/DDL monad stack)
+- [ ] Temporal type annotations for bi-temporal queries
+- [ ] Linear types for connections and transactions (Ephapax integration where Idris2 allows)
+
+=== Phase 4 — Production Hardening
+- [ ] Performance benchmarks against raw SQL
+- [ ] VeriSimDB 6-modal query planner integration
+- [ ] ReScript client SDK with type generation
+- [ ] Documentation and specification publishing
+
+== Related Projects
+
+- https://github.com/hyperpolymath/nextgen-databases[nextgen-databases] — VeriSimDB, QuandleDB, LithoGlyph
+- `nextgen-databases/verisimdb/vql-bridge` — Current VQL bridge (to be superseded)
+- `typell/crates/typell-vql` — TypeLL VQL integration
+- `proven/bindings/vql` — Proven formal verification bindings
+- `hypatia/lib/vql` — Hypatia VQL client
+
+== Building
+
+[source,bash]
+----
+# Type-check the Idris2 core
+cd src/abi && idris2 --check VqlUt.Core
+
+# Build FFI
+cd ffi/zig && zig build
+
+# Run tests
+just test
+----
+
+== License
+
+PMPL-1.0-or-later
