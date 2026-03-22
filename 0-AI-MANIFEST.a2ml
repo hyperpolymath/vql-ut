@@ -133,6 +133,16 @@ These a2ml files MUST exist in `.machine_readable/` directory ONLY:
 | panll | Panel framework (integrates TypeLL type safety) |
 | nextgen-languages/affinescript | Sister showcase for type safety adoption |
 
+## VERISIMDB INSTANCE POLICY (CRITICAL)
+
+VQL-UT connects to **whichever VeriSimDB instance the user's project runs**.
+Every project has its own VeriSimDB on a unique port. The LSP's `verisimdb_url`
+defaults to empty and MUST be configured per-workspace.
+
+- **NEVER** default to `localhost:8080` — that is VeriSimDB's own dev server.
+- **NEVER** hardcode any port — each project chooses its own.
+- The user configures the URL via workspace settings or `connect_verisimdb()`.
+
 ## SESSION STARTUP CHECKLIST
 
 ✅ Read THIS file (0-AI-MANIFEST.a2ml) first

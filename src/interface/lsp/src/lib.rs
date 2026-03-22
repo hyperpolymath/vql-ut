@@ -1,3 +1,4 @@
+#![forbid(unsafe_code)]
 // SPDX-License-Identifier: PMPL-1.0-or-later
 //! VQL-UT LSP Library
 //!
@@ -8,6 +9,10 @@ use std::collections::HashMap;
 
 pub struct VqlutLsp {
     pub schema: HashMap<String, Vec<String>>, // table_name -> columns
+    /// Default VeriSimDB URL. Each project runs its own VeriSimDB instance on a
+    /// unique port. Do NOT hardcode localhost:8080 — that is the VeriSimDB
+    /// development server. Configure this per-workspace to match the target
+    /// project's VeriSimDB port.
     pub verisimdb_url: String,
 }
 
@@ -15,20 +20,36 @@ impl VqlutLsp {
     pub fn new() -> Self {
         Self {
             schema: HashMap::new(),
-            verisimdb_url: "http://localhost:8080".to_string(),
+            // Empty by default — the user MUST configure this per-workspace.
+            // Each project runs its own VeriSimDB instance on a different port.
+            // Do NOT default to localhost:8080 (VeriSimDB dev server).
+            verisimdb_url: String::new(),
         }
     }
 
+    /// Connect to a specific VeriSimDB instance.
+    ///
+    /// Each workspace should call this with its own VeriSimDB URL before
+    /// fetching schema. Do NOT pass "http://localhost:8080" — that port is
+    /// reserved for the VeriSimDB development server itself.
     pub fn connect_verisimdb(&mut self, url: &str) {
         self.verisimdb_url = url.to_string();
     }
 
     pub fn fetch_schema(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        // Guard: verisimdb_url must be configured per-workspace before use.
+        if self.verisimdb_url.is_empty() {
+            return Err("VeriSimDB URL not configured. Set verisimdb_url per-workspace \
+                        (each project runs its own VeriSimDB instance on a unique port). \
+                        Do NOT use localhost:8080 — that is the VeriSimDB dev server."
+                .into());
+        }
+
         // Connect to VeriSimDB via database-mcp cartridge
         // For now, simulate fetching schema from VeriSimDB
         // In production, this would use the database-mcp cartridge to execute a VQL query
         // and fetch the schema (tables and columns)
-        
+
         // Simulate fetching schema from VeriSimDB
         self.schema.clear();
         self.schema.insert("users".to_string(), vec!["id".to_string(), "name".to_string(), "email".to_string()]);
