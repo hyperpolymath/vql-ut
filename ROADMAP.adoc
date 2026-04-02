@@ -4,8 +4,15 @@ Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 
 == Current Status
 
-Pre-Alpha. ABI/FFI skeleton created. 10 type safety levels documented.
-Parser work not yet started.
+Experimental / Pre-Alpha.
+
+Current implemented evidence is narrower than the long-term design:
+
+* Rust formatter/linter crates with integration tests are live
+* draft Idris2 core and ABI modules exist
+* Zig/ReScript integration work is still early
+
+This repo does not yet justify claims of end-to-end verification, proof-carrying execution, or production release.
 
 == Milestones
 
@@ -35,11 +42,12 @@ Parser work not yet started.
 * [ ] Migration guide from VQL-DT to VQL-UT
 * [ ] Benchmark: VQL-UT overhead vs VQL-DT overhead
 
-=== v1.0.0 — Production Release
+=== v1.0.0 — Audited Stable Release
 * [ ] Performance benchmarks against raw SQL
 * [ ] VeriSimDB 6-modal query planner integration
 * [ ] ReScript client SDK with type generation
 * [ ] Documentation and specification publishing
+* [ ] Stable gate passes with no template residue, fake evidence, or unfinished audit blockers
 
 == Dependencies
 
@@ -51,7 +59,7 @@ Parser work not yet started.
 
 == Future Directions
 
-Once v1.0.0 ships:
+Once an audited stable release exists:
 
 * Federation support (VQL-UT queries across federated VeriSimDB instances)
 * VQL-UT as LSP language server for IDE integration

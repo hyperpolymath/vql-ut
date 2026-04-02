@@ -1,6 +1,6 @@
 {
   "title": "VQL-UT: Progressive Type Safety for Database Query Languages",
-  "description": "Database query bugs form a total order by severity. VQL-UT formalises this as progressive levels of type-level query safety, each strictly subsuming all prior levels. Levels 1-6 (established) cover parse-time to result-type safety. Levels 7-10 (research) cover aliasing, effects, lifetimes, and linearity via QTT. Formalised in Idris 2 with zero runtime overhead through proof erasure.",
+  "description": "Database query bugs can be organised as progressive levels of query safety. VQL-UT is currently a design-stage proposal and research prototype for expressing that safety envelope for VeriSimDB-style queries. The repository contains Rust formatter/linter tooling plus draft Idris2 encodings and architecture notes; it does not yet provide a fully mechanised 10-level implementation or end-to-end zero-overhead proof pipeline.",
   "upload_type": "publication",
   "publication_type": "preprint",
   "creators": [{"name": "Jewell, Jonathan D.A.", "affiliation": "The Open University"}],

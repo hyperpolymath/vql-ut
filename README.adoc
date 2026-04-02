@@ -2,7 +2,7 @@
 = VQL-UT (VQL Ultimate Type-Safe)
 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 :spdx: PMPL-1.0-or-later
-:status: Pre-Alpha
+:status: Experimental / Pre-Alpha
 :toc: preamble
 :icons: font
 
@@ -12,15 +12,34 @@ image:https://img.shields.io/badge/tests-49_pass-brightgreen[tests: 49 pass]
 
 == Overview
 
-VQL-UT is the next-generation query language for https://github.com/hyperpolymath/nextgen-databases[VeriSimDB], designed to satisfy **all 10 levels of type safety** — the 6 established IO-covered forms and the 4 additional forms identified through our research.
+VQL-UT is an experimental research repo for a proposed type-safe query layer for https://github.com/hyperpolymath/nextgen-databases[VeriSimDB]. The current repository contains:
 
-The goal is production-worthy VQL that is provably correct at every layer, from parse to execution. At minimum, this repo serves as a research vehicle for exploring the boundaries of type-safe query languages.
+* Rust formatter and linter crates with integration tests over the current surface syntax
+* Draft Idris2 encodings for core safety levels and ABI/FFI types
+* Zig/ReScript scaffolding for future integration work
+
+It does *not* yet provide a mechanically checked end-to-end query compiler, proof-certificate pipeline, or production-ready VeriSimDB integration. The 10-level model described below is the target design envelope for the project, not a statement that every level is already implemented or verified in this repo.
 
 NOTE: This project was briefly known as "vql++" during early discussion. The canonical name is *VQL-UT* (Ultimate Type-Safe). All references to vql++, vqlpp, or VQL Plus Plus should be read as VQL-UT. File extension: `.vqlut`.
 
+== Current Evidence Boundary
+
+As of 2026-03-30, the strongest claims this repository currently supports are:
+
+* the Rust formatter/linter surface and its integration tests
+* draft Idris2 data types and checker structure for the proposed safety levels
+* ABI/FFI design work in Idris2/Zig scaffolding
+
+What remains draft:
+
+* a full parse-bind-check-analyse-compile-execute pipeline
+* machine-checked proofs covering the whole 10-level story
+* proof-carrying execution against VeriSimDB
+* any claim of production readiness or audited stable release
+
 == Lineage
 
-The 10 type safety levels originate in **TypeLL** (the core type theory), flow into **PanLL** (panel framework type safety), and are now applied to database queries as **VQL-UT**.
+The 10 type safety levels originate in **TypeLL** (the core type theory), flow into **PanLL** (panel framework type safety), and are the intended design basis for **VQL-UT**.
 
 [source]
 ----
@@ -45,9 +64,8 @@ TypeLL (type theory core — defines the 10 levels)
 
 | **VQL-UT**
 | The safety pipeline
-| 10 progressive levels. Sits behind VQL, applies automatically. Simple queries
-  short-circuit at L1-L2. Proof-carrying queries (with `PROOF` clause) go through
-  L9-L10. Invisible to the user except when they add a `PROOF` clause.
+| Target design: 10 progressive levels sitting behind VQL. The current repo does
+  not yet implement this whole pipeline end to end.
 |===
 
 NOTE: VQL-DT (Dependent Types) was the original name for the proof-carrying execution
@@ -67,7 +85,7 @@ The type safety story unfolds in three phases:
 2. Once proven, **VQL-UT** and **AffineScript** become the two showcase languages for teaching people the 10 levels of type safety
 3. VQL-UT handles the database query domain; AffineScript handles general-purpose programming
 
-== The 10 Levels of Type Safety
+== Target 10-Level Safety Model
 
 === Established (IO-Covered) — 6 Levels
 
@@ -111,7 +129,9 @@ The https://github.com/hyperpolymath/nextgen-databases[typeql-experimental] sub-
 | Quantitative type theory | `USAGE LIMIT n` | Bounded resource tracking via QTT
 |===
 
-== Architecture
+== Target Architecture
+
+NOTE: The diagram below describes the intended architecture. The current repository only implements parts of the formatter/linter surface plus draft Idris2/Zig components.
 
 [source]
 ----
@@ -146,27 +166,27 @@ The https://github.com/hyperpolymath/nextgen-databases[typeql-experimental] sub-
                     +-----------------------+
 ----
 
-== Technology Stack
+== Current and Planned Technology Stack
 
 [cols="1,1,2"]
 |===
 | Layer | Language | Purpose
 
-| Core type system | Idris2 | Dependent types for all 10 safety levels. `%default total`.
-| FFI bridge | Zig | C-ABI query plan compilation. Zero-copy result sets.
-| Parser | ReScript | Surface syntax parsing, extending VeriSimDB's VQL parser.
-| API layer | V-lang | REST/gRPC/GraphQL endpoints for query submission.
-| VeriSimDB integration | Elixir | 6-modal storage engine connection via NIFs.
+| Core type system | Idris2 | Draft data types and checker structure for the proposed safety levels.
+| FFI bridge | Zig | ABI/FFI scaffolding for future query-plan integration.
+| Parser | ReScript | Surface syntax/parsing experiments.
+| API layer | V-lang | Planned external API layer, not yet a release surface.
+| VeriSimDB integration | Elixir | Planned downstream integration target.
 |===
 
 == Roadmap
 
 === Phase 1 — Foundation (Levels 1-3)
-- [ ] VQL-UT grammar specification (EBNF, extending VQL v3.0)
+- [x] VQL-UT grammar specification (EBNF, extending VQL v3.0) (see docs/vql-ut-grammar.ebnf)
 - [ ] Idris2 parser with totality proof
-- [ ] Schema representation as dependent types
-- [ ] Type-compatible operation checker
-- [ ] Zig FFI for query plan emission
+- [x] Schema representation as dependent types (`src/core/Schema.idr`)
+- [x] Type-compatible operation checker (`src/core/Checker.idr`)
+- [x] Zig FFI for query plan emission (`src/interface/ffi` + Zig build)
 - [ ] Basic test suite against VeriSimDB
 
 === Phase 2 — Safety Core (Levels 4-6)

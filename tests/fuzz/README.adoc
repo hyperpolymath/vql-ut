@@ -1,0 +1,7 @@
+= Fuzz Surface
+
+This directory is reserved for future fuzzing work.
+
+As of 2026-03-30, `vql-ut` does not claim an active fuzz harness in this repo.
+Do not treat this directory as evidence of fuzz coverage until a real corpus,
+driver, and runnable command land here.

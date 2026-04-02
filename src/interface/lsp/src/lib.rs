@@ -16,6 +16,12 @@ pub struct VqlutLsp {
     pub verisimdb_url: String,
 }
 
+impl Default for VqlutLsp {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl VqlutLsp {
     pub fn new() -> Self {
         Self {
@@ -39,10 +45,12 @@ impl VqlutLsp {
     pub fn fetch_schema(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         // Guard: verisimdb_url must be configured per-workspace before use.
         if self.verisimdb_url.is_empty() {
-            return Err("VeriSimDB URL not configured. Set verisimdb_url per-workspace \
+            return Err(
+                "VeriSimDB URL not configured. Set verisimdb_url per-workspace \
                         (each project runs its own VeriSimDB instance on a unique port). \
                         Do NOT use localhost:8080 — that is the VeriSimDB dev server."
-                .into());
+                    .into(),
+            );
         }
 
         // Connect to VeriSimDB via database-mcp cartridge
@@ -52,10 +60,19 @@ impl VqlutLsp {
 
         // Simulate fetching schema from VeriSimDB
         self.schema.clear();
-        self.schema.insert("users".to_string(), vec!["id".to_string(), "name".to_string(), "email".to_string()]);
-        self.schema.insert("posts".to_string(), vec!["id".to_string(), "title".to_string(), "content".to_string()]);
-        self.schema.insert("comments".to_string(), vec!["id".to_string(), "post_id".to_string(), "text".to_string()]);
-        
+        self.schema.insert(
+            "users".to_string(),
+            vec!["id".to_string(), "name".to_string(), "email".to_string()],
+        );
+        self.schema.insert(
+            "posts".to_string(),
+            vec!["id".to_string(), "title".to_string(), "content".to_string()],
+        );
+        self.schema.insert(
+            "comments".to_string(),
+            vec!["id".to_string(), "post_id".to_string(), "text".to_string()],
+        );
+
         Ok(())
     }
 
@@ -69,8 +86,8 @@ impl VqlutLsp {
         let line = position.line as usize;
         let character = position.character as usize;
 
-        // TODO: Parse the VQL-UT file at the given position to find the table/column
-        // For now, return a dummy response with schema-based navigation
+        // Current prototype behavior: return schema-shaped navigation until
+        // file-aware parsing is wired in.
         if let Some((table, _)) = self.schema.iter().next() {
             Some(GotoDefinitionResponse::Scalar(Location {
                 uri,
@@ -108,8 +125,8 @@ impl VqlutLsp {
         let line = position.line as usize;
         let character = position.character as usize;
 
-        // TODO: Parse the VQL-UT file at the given position to find the keyword/type
-        // For now, return a dummy response
+        // Current prototype behavior: return a fixed hover until file-aware
+        // parsing is wired in.
         Some(Hover {
             contents: HoverContents::Scalar(MarkedString::String(
                 "VQL-UT Keyword or Type".to_string(),
@@ -130,11 +147,11 @@ impl VqlutLsp {
     pub fn handle_completion(&self, params: CompletionParams) -> Option<CompletionResponse> {
         // Extract the position from the params
         let position = params.text_document_position.position;
-        let line = position.line as usize;
-        let character = position.character as usize;
+        let _line = position.line as usize;
+        let _character = position.character as usize;
 
-        // TODO: Parse the VQL-UT file at the given position to suggest completions
-        // For now, return a dummy response with some VQL-UT keywords and schema
+        // Current prototype behavior: return fixed keyword and schema-derived
+        // completions until file-aware parsing is wired in.
         let mut items = vec![
             CompletionItem {
                 label: "SELECT".to_string(),

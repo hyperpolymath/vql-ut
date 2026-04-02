@@ -13,7 +13,9 @@
 /// All lines are trimmed of leading/trailing whitespace before processing.
 pub fn format_vqlut(content: &str) -> String {
     let mut formatted = String::new();
-    let keywords = ["SELECT", "FROM", "WHERE", "GROUP", "ORDER", "HAVING", "LIMIT"];
+    let keywords = [
+        "SELECT", "FROM", "WHERE", "GROUP", "ORDER", "HAVING", "LIMIT",
+    ];
 
     for line in content.lines() {
         let trimmed = line.trim();

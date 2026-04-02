@@ -1,0 +1,11 @@
+= End-to-End Test Surface
+
+The current end-to-end slice is exercised through `tests/integration_test.rs`
+using the `e2e_`-prefixed Rust integration tests.
+
+Run it with:
+
+[source,bash]
+----
+just test-e2e
+----

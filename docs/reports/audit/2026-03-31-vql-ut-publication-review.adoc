@@ -1,0 +1,65 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= VQL-UT Publication Review 2026-03-31
+:revdate: 2026-03-31
+
+== Verdict
+
+Status: `publishable after repair`
+
+VQL-UT is not a verified 10-level system today, but it is no longer forced into
+the same red bucket as Patch Bridge if the paper is treated honestly as a
+taxonomy/proposal plus early prototype. The repo now has real Rust test slices,
+yet the proof and full pipeline claims are still ahead of the evidence.
+
+== Evidence checked in this pass
+
+Directly rerun from the current workspace:
+
+* `cargo test` passes (`49` integration tests, `0` failures).
+* `just test-e2e` passes (`4` end-to-end slice tests).
+* `just test-aspect` passes (`12` aspect slice tests).
+* `just bench` passes as a benchmark-smoke/stress slice (`2` stress tests).
+
+Still failing:
+
+* `just lint` fails in `src/interface/lsp/src/main.rs` with nine Clippy/compiler
+  errors (illegal `mod lib;`, incorrect async assumptions around `lsp-server`,
+  wrong request typing, and shutdown handling mismatch).
+
+Still absent:
+
+* no mechanised proof corpus for the 10-level claims
+* no end-to-end verified query pipeline against VeriSimDB
+* no evidence that the repo enforces all ten levels at compile time
+
+== Containment actions taken in this pass
+
+* `arcvix-10-level-query-safety.tex` now frames the Idris2 core and Zig bridge
+  as planned architecture where appropriate, rather than current checked
+  implementation.
+* The comparison table now labels `VQL-UT` as a design target rather than a
+  present repository achievement.
+* The formal-properties section now states explicitly that the key statements are
+  target properties, not currently mechanised proofs in the repo.
+* The conclusion now describes score~10 as the design target, not an achieved
+  compile-time guarantee.
+* `.zenodo.json` now uses design-stage wording instead of advertising a fully
+  mechanised zero-overhead system.
+
+== Remaining blockers
+
+* `just lint` must pass before any release-grade or archival push.
+* Proof claims remain unsupported until Idris2/Lean/Agda artefacts actually
+  exist and compile.
+* The paper must stay scoped to taxonomy, formal framing, and prototype status;
+  any wording that implies end-to-end checked enforcement would reopen the claim
+  gap immediately.
+
+== Decision
+
+Treat `vql-ut` as `YELLOW`:
+
+* acceptable to continue polishing as a proposal/preprint
+* not acceptable to present as a completed verified query system
+* do not push Zenodo/HAL until the lint failure is fixed and the paper receives
+  a final claim-alignment pass

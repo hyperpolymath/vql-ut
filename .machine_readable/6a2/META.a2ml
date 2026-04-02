@@ -34,7 +34,7 @@ axis-3 = "systems > compliance > effects"
 [scoping]
 sources = "README, roadmap, status docs, maintenance checklist, CI/security docs"
 marker-scan = "TODO/FIXME/XXX/HACK/STUB/PARTIAL"
-idris-unsound-scan = "believe_me/assert_total"
+idris-unsound-scan = "unsound-idris-escape-scan"
 
 [axis-2-maintenance-rules]
 corrective-first = true

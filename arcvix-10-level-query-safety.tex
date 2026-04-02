@@ -1,10 +1,10 @@
 % SPDX-License-Identifier: PMPL-1.0-or-later
 % Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 %
-% A Decalogue of Database Query Safety:
+% Towards a Decalogue of Database Query Safety:
 % Progressive Type-Level Guarantees from Parse-Time to Provenance
 %
-% Prepared for arXiv submission (cs.PL / cs.DB crossover)
+% Draft manuscript under audit
 
 \documentclass[11pt,a4paper]{article}
 
@@ -135,7 +135,7 @@
 % Title
 % ============================================================================
 \title{%
-  \textbf{A Decalogue of Database Query Safety:\\
+  \textbf{Towards a Decalogue of Database Query Safety:\\
   Progressive Type-Level Guarantees\\
   from Parse-Time to Provenance}%
 }
@@ -164,31 +164,33 @@ Database query bugs span a remarkably wide spectrum, from syntactic
 malformation to cryptographic provenance failure.  We observe that these
 failure modes form a \emph{total order} by severity and subtlety: each
 successive class of bug presupposes the absence of all preceding classes.
-We formalise this observation as a \emph{decalogue}---ten progressive
-levels of type-level query safety, each strictly subsuming all prior
-levels.
+We develop this observation into a \emph{draft decalogue}---ten progressive
+levels of type-level query safety intended to subsume the prior ones.
 
 Levels 1--6 (parse-time safety, schema-binding safety, type-compatible
 operations, null safety, injection-proof safety, and permission safety)
 are individually addressed, though rarely unified, in the existing
 literature.  Levels 7--10 (cardinality safety, consistency safety,
-temporal safety, and provenance safety) constitute the novel contribution
-of this work: we show that these four properties can be encoded as
-type-level invariants in a dependently-typed query language and that the
-ten levels together form a bounded lattice under the subsumption
-ordering.
+temporal safety, and provenance safety) are proposed here as candidate
+extensions to that safety envelope.  We give formal definitions,
+an intended subsumption structure, and a prototype implementation plan
+for representing them in a dependently-typed setting.
 
 We present \VQL{}, a query language for the multi-modal database
-\VeriSimDB{}, in which all ten levels are enforced at compile time
-through a combination of dependent types, quantitative type theory,
-algebraic effect systems, and session types.  We provide formal
-definitions, subsumption proofs, and a reference implementation strategy
-using Idris\,2 for the verification core and ReScript for the parser
-front-end.  To our knowledge, this is the first system to unify all ten
-safety classes under a single type-theoretic framework, and the first to
-extend compile-time query safety to the domains of cardinality,
-consistency, temporality, and provenance.
+\VeriSimDB{}, as a design target and early prototype rather than a finished
+system in which all ten levels are already enforced at compile time.
+The current repository contains Rust formatter/linter tooling, draft Idris\,2
+encodings for parts of the safety model and ABI, and an implementation plan
+for the remaining pipeline.  The paper's strongest claims are therefore about
+the taxonomy, formal problem framing, and proposed architecture; full
+mechanisation and end-to-end enforcement remain ongoing work.
 \end{abstract}
+
+\noindent
+\textbf{Status note:} Draft manuscript under repository audit. Earlier drafts
+overstated implementation maturity; this version should be read as a proposal
+and prototype report, not as a claim that the repository already provides a
+fully verified end-to-end VQL-UT system.
 
 \noindent
 \textbf{Keywords:} query safety, dependent types, type-safe databases,
@@ -221,7 +223,7 @@ This paper makes three contributions:
 \begin{enumerate}[label=(\roman*)]
   \item \textbf{The Decalogue.}  We identify ten levels of database
     query safety, numbered \LevelN{1} through \LevelN{10}, and show
-    that they form a total order under the subsumption relation: a
+    how they are intended to form a total order under the subsumption relation: a
     query that is \Safe{k}-safe is automatically \Safe{j}-safe for all
     $j < k$.
 
@@ -229,15 +231,16 @@ This paper makes three contributions:
     individually addressed (though seldom unified) in the literature,
     levels 7--10---cardinality safety, consistency safety, temporal
     safety, and provenance safety---have never been formalised as
-    type-level invariants in a query language.  We provide formal
-    definitions and demonstrate their encodability in a dependently-typed
+    type-level invariants in a query language.  We provide draft formal
+    definitions and argue that they can be encoded in a dependently-typed
     core calculus.
 
   \item \textbf{A Concrete Realisation.}  We present \VQL{}, a query
     language for the \VeriSimDB{} multi-modal database system, in which
-    all ten levels are enforced at compile time.  The verification core
-    is implemented in Idris\,2; the parser front-end in ReScript; and
-    the runtime bridge in Zig via C-ABI FFI.
+    the long-term goal is compile-time enforcement across all ten levels.
+    The current repository provides an early prototype: Rust surface
+    tooling, draft Idris\,2 encodings, and ABI/FFI scaffolding rather
+    than a finished end-to-end verified implementation.
 \end{enumerate}
 
 \paragraph{Organisation.}
@@ -1299,9 +1302,10 @@ The parser produces a typed AST in which each node carries its source
 location, enabling precise error messages with suggestions (e.g.,
 ``Did you mean \texttt{email}?'' for a typo \texttt{emial}).
 
-\subsection{Verification Core (Idris\,2)}
+\subsection{Planned Verification Core (Idris\,2)}
 
-Levels~2--10 are implemented in Idris\,2, chosen for three reasons:
+The intended verification core is planned in Idris\,2, chosen for three
+reasons:
 \begin{enumerate}[nosep]
   \item \textbf{Dependent types} enable schema-level type checking
     (Levels~2--6).
@@ -1311,19 +1315,20 @@ Levels~2--10 are implemented in Idris\,2, chosen for three reasons:
     linear resource tracking (Levels~9--10).
 \end{enumerate}
 
-The verification core is structured as a series of passes, each
-corresponding to one or more safety levels.  Each pass either
-transforms the AST (adding type annotations, resolving schema
-references) or rejects the query with a structured error.
+The long-term verification core is intended to be structured as a series
+of passes, each corresponding to one or more safety levels. The current
+repository contains draft Idris\,2 encodings for parts of the model and
+ABI, not a checked end-to-end Levels~2--10 implementation.
 
-\subsection{FFI Bridge (Zig)}
+\subsection{Planned FFI Bridge (Zig)}
 
-The verified AST is compiled to a C-ABI query plan by a code generator
-written in Zig.  Zig was chosen for its zero-overhead C interoperability,
+The intended architecture compiles a verified AST to a C-ABI query plan
+using a code generator written in Zig.  Zig was chosen for its zero-overhead C interoperability,
 cross-compilation support, and safety features (bounds checking,
 no hidden control flow).  The query plan is a sequence of low-level
 operations that the \VeriSimDB{} engine can execute directly, with
-no runtime type checking overhead.
+no runtime type checking overhead in the design target. The current
+repository does not yet provide this full checked pipeline.
 
 \subsection{Performance Considerations}
 
@@ -1347,11 +1352,10 @@ unacceptable compilation overhead.  We observe that:
     separate pass.
 \end{itemize}
 
-Critically, \emph{all checking occurs at compile time}.  The generated
-query plan contains no runtime type checks, no null guards, no
-permission checks, and no effect assertions.  The runtime cost is
-exactly the cost of executing the query plan---identical to hand-written,
-unchecked queries.
+These are design expectations rather than established measurements.
+The current repository does not yet provide the complete compiler path
+needed to validate compile-time-only enforcement or zero-overhead code
+generation across all ten levels.
 
 % ============================================================================
 \section{Comparison with Existing Query Languages}\label{sec:comparison}
@@ -1397,7 +1401,7 @@ Ur/Web             & \checkmark & \checkmark & \checkmark & \checkmark & \checkm
 EdgeQL             & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & $\sim$     & $\sim$     & \texttimes & \texttimes & \texttimes & 5 \\
 PRQL               & \checkmark & $\sim$     & $\sim$     & \texttimes & \checkmark & \texttimes & \texttimes & \texttimes & \texttimes & \texttimes & 1 \\
 Malloy             & \checkmark & \checkmark & \checkmark & $\sim$     & \checkmark & \texttimes & \texttimes & \texttimes & \texttimes & \texttimes & 3 \\
-\textbf{VQL-UT}    & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \textbf{10} \\
+\textbf{VQL-UT (design target)} & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \textbf{10} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1424,6 +1428,10 @@ versions.  The comparison reflects the state of each system at the
 time of writing (March 2026).  Our intent is not to disparage these
 excellent systems but to identify the frontier they have not yet
 reached.
+
+The final row describes \VQL{} as a design target rather than a current
+repository achievement. The present repo does not yet implement or prove
+all ten levels end to end.
 
 % ============================================================================
 \section{The Classification Insight}\label{sec:classification}
@@ -1472,9 +1480,10 @@ taxonomic contribution of this paper.
 \section{Formal Properties}\label{sec:formal}
 % ============================================================================
 
-We state several key properties of the \VQL{} type system.  Full
-proofs are mechanised in Idris\,2 and available in the supplementary
-material.
+We state several target properties of the \VQL{} type system. Full
+proofs are \emph{not} yet mechanised in the current repository; the
+statements below should be read as the intended metatheory for the
+proposed system rather than as checked results.
 
 \begin{theorem}[Type Soundness]
 If a \VQL{} query $q$ type-checks at safety level $k$, then
@@ -1606,18 +1615,15 @@ The key insight is that database bugs are not a cloud of independent
 failure modes but a \emph{chain}: each class of bug presupposes the
 absence of all less severe classes.  This total ordering enables a
 meaningful ``safety score'' for any query language---the highest level
-at which the chain is unbroken.  Existing query languages achieve
-scores between 0 and~6.  \VQL{}, through its combination of dependent
-types, algebraic effects, refinement types, and quantitative type
-theory, achieves a score of~10.
+at which the chain is unbroken. Existing deployed query languages
+appear to score between 0 and~6 in the comparison above, while \VQL{}
+is proposed as a design target for score~10 rather than a present
+repository achievement.
 
-The practical consequence is a query language in which correctness
-is not a goal but a mathematical guarantee, enforced at compile time
-with zero runtime overhead.  Every query that passes the type checker
-is automatically safe against syntax errors, schema mismatches, type
-coercion bugs, null propagation errors, injection attacks, permission
-violations, cardinality mismatches, effect violations, temporal
-staleness, and provenance forgery.
+The practical consequence, if the full system is completed, would be a
+query language in which these guarantees are enforced at compile time
+with minimal or zero runtime overhead. The current repository does not
+yet justify claiming that end-to-end state.
 
 The theoretical consequence is a framework for classifying and
 comparing query language safety properties.  The decalogue provides a

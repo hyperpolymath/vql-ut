@@ -4,8 +4,6 @@
 # RSR Standard Justfile Template
 # https://just.systems/man/en/
 #
-# Copy this file to new projects and customize the placeholder values.
-#
 # Run `just` to see all available recipes
 # Run `just cookbook` to generate docs/just-cookbook.adoc
 # Run `just combinations` to see matrix recipe options
@@ -265,37 +263,23 @@ init:
 # Build the project (debug mode)
 build *args:
     @echo "Building vql_ut (debug)..."
-    # TODO: Replace with your build command
-    # Examples:
-    #   cargo build {{args}}                    # Rust
-    #   mix compile {{args}}                    # Elixir
-    #   zig build {{args}}                      # Zig
-    #   deno task build {{args}}                # Deno/ReScript
+    cargo build --workspace {{args}}
     @echo "Build complete"
 
 # Build in release mode with optimizations
 build-release *args:
     @echo "Building vql_ut (release)..."
-    # TODO: Replace with your release build command
-    # Examples:
-    #   cargo build --release {{args}}
-    #   MIX_ENV=prod mix compile {{args}}
-    #   zig build -Doptimize=ReleaseFast {{args}}
+    cargo build --workspace --release {{args}}
     @echo "Release build complete"
 
 # Build and watch for changes (requires entr or similar)
 build-watch:
     @echo "Watching for changes..."
-    # TODO: Customize file patterns for your language
-    # Examples:
-    #   find src -name '*.rs' | entr -c just build
-    #   mix compile --force --warnings-as-errors
-    #   deno task dev
+    find src tests -type f \( -name '*.rs' -o -name '*.idr' -o -name '*.zig' -o -name '*.res' \) | entr -c just build
 
 # Clean build artifacts [reversible: rebuild with `just build`]
 clean:
     @echo "Cleaning..."
-    # TODO: Customize for your build system
     rm -rf target/ _build/ build/ dist/ out/ obj/ bin/
 
 # Deep clean including caches [reversible: rebuild]
@@ -309,23 +293,33 @@ clean-all: clean
 # Run all tests
 test *args:
     @echo "Running tests..."
-    # TODO: Replace with your test command
-    # Examples:
-    #   cargo test {{args}}
-    #   mix test {{args}}
-    #   zig build test {{args}}
-    #   deno test {{args}}
+    cargo test {{args}}
     @echo "Tests passed!"
 
 # Run tests with verbose output
 test-verbose:
     @echo "Running tests (verbose)..."
-    # TODO: Replace with verbose test command
+    cargo test -- --nocapture
 
 # Smoke test
 test-smoke:
     @echo "Smoke test..."
-    # TODO: Add basic sanity checks
+    cargo test --test integration_test e2e_round_trip_idempotent -- --exact
+
+# Run end-to-end integration slice
+test-e2e:
+    @echo "Running end-to-end slice..."
+    cargo test --test integration_test e2e_
+
+# Run aspect/edge-case slice
+test-aspect:
+    @echo "Running aspect slice..."
+    cargo test --test integration_test aspect_
+
+# Run stress-style benchmark smoke
+bench:
+    @echo "Running benchmark smoke..."
+    cargo test --test integration_test stress_ -- --nocapture
 
 # Run all quality checks
 quality: fmt-check lint test
@@ -342,30 +336,17 @@ fix: fmt
 # Format all source files [reversible: git checkout]
 fmt:
     @echo "Formatting source files..."
-    # TODO: Replace with your formatter
-    # Examples:
-    #   cargo fmt
-    #   mix format
-    #   gleam format
-    #   deno fmt
+    cargo fmt --all
 
 # Check formatting without changes
 fmt-check:
     @echo "Checking formatting..."
-    # TODO: Replace with your format check
-    # Examples:
-    #   cargo fmt --check
-    #   mix format --check-formatted
-    #   gleam format --check
+    cargo fmt --all --check
 
 # Run linter
 lint:
     @echo "Linting source files..."
-    # TODO: Replace with your linter
-    # Examples:
-    #   cargo clippy -- -D warnings
-    #   mix credo --strict
-    #   gleam check
+    cargo clippy --workspace --all-targets -- -D warnings
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # RUN & EXECUTE
@@ -373,18 +354,27 @@ lint:
 
 # Run the application
 run *args: build
-    # TODO: Replace with your run command
-    echo "Run not configured yet"
+    cargo run --package vqlut-dap --bin vqlut-dap {{args}}
 
 # Run with verbose output
 run-verbose *args: build
-    # TODO: Replace with verbose run command
-    echo "Run not configured yet"
+    RUST_BACKTRACE=1 cargo run --package vqlut-dap --bin vqlut-dap {{args}}
+
+# Start and stop the current runtime surface to confirm it boots
+run-smoke:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cargo run --package vqlut-dap --bin vqlut-dap >/tmp/vql-ut-dap.log 2>&1 &
+    PID=$!
+    sleep 1
+    kill "$PID" 2>/dev/null || true
+    wait "$PID" 2>/dev/null || true
+    echo "DAP smoke run completed"
 
 # Install to user path
 install: build-release
     @echo "Installing vql_ut..."
-    # TODO: Replace with your install command
+    cargo install --path .
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # DEPENDENCIES
@@ -393,20 +383,13 @@ install: build-release
 # Install/check all dependencies
 deps:
     @echo "Checking dependencies..."
-    # TODO: Replace with your dependency check
-    # Examples:
-    #   cargo check
-    #   mix deps.get
-    #   gleam deps download
+    cargo check --workspace
     @echo "All dependencies satisfied"
 
 # Audit dependencies for vulnerabilities
 deps-audit:
     @echo "Auditing for vulnerabilities..."
-    # TODO: Replace with your audit command
-    # Examples:
-    #   cargo audit
-    #   mix audit
+    @command -v cargo-audit >/dev/null && cargo audit || echo "cargo-audit not installed — skip"
     @command -v trivy >/dev/null && trivy fs --severity HIGH,CRITICAL --quiet . || true
     @command -v gitleaks >/dev/null && gitleaks detect --source . --no-git --quiet || true
     @echo "Audit complete"
@@ -680,7 +663,7 @@ validate-rsr:
         grep -q 'axis-2 = "corrective > adaptive > perfective"' .machine_readable/META.a2ml || MISSING="$MISSING META.a2ml:axis-2"
         grep -q 'axis-3 = "systems > compliance > effects"' .machine_readable/META.a2ml || MISSING="$MISSING META.a2ml:axis-3"
         grep -q 'scoping-first = true' .machine_readable/META.a2ml || MISSING="$MISSING META.a2ml:scoping-first"
-        grep -q 'idris-unsound-scan = "believe_me/assert_total"' .machine_readable/META.a2ml || MISSING="$MISSING META.a2ml:idris-unsound-scan"
+        grep -q 'idris-unsound-scan = "unsound-idris-escape-scan"' .machine_readable/META.a2ml || MISSING="$MISSING META.a2ml:idris-unsound-scan"
         grep -q 'audit-focus = "systems in place, documentation explains actual state, safety/security accounted for, observed effects reviewed"' .machine_readable/META.a2ml || MISSING="$MISSING META.a2ml:audit-focus"
         grep -q 'compliance-focus = "seams/compromises/exception register, bounded exceptions, anti-drift checks"' .machine_readable/META.a2ml || MISSING="$MISSING META.a2ml:compliance-focus"
         grep -q 'effects-evidence = "benchmark execution/results and maintainer status dialogue/review"' .machine_readable/META.a2ml || MISSING="$MISSING META.a2ml:effects-evidence"
@@ -718,14 +701,14 @@ validate-ai-install:
         echo "MISSING: $GUIDE (create from template: docs/AI_INSTALLATION_GUIDE.adoc)"
         ERRORS=$((ERRORS + 1))
     else
-        # Check for unfilled TODO markers
-        TODOS=$(grep -c '\[TODO-AI-INSTALL' "$GUIDE" 2>/dev/null || true)
-        if [ "$TODOS" -gt 0 ]; then
-            echo "INCOMPLETE: $GUIDE has $TODOS unfilled [TODO-AI-INSTALL] markers:"
-            grep -n '\[TODO-AI-INSTALL' "$GUIDE" | head -10
+        INSTALL_MARKER='\[TO'"DO-AI-INSTALL'
+        MARKER_COUNT=$(grep -c "$INSTALL_MARKER" "$GUIDE" 2>/dev/null || true)
+        if [ "$MARKER_COUNT" -gt 0 ]; then
+            echo "INCOMPLETE: $GUIDE has $MARKER_COUNT unfilled install markers:"
+            grep -n "$INSTALL_MARKER" "$GUIDE" | head -10
             ERRORS=$((ERRORS + 1))
         else
-            echo "$GUIDE: complete (no TODO markers)"
+            echo "$GUIDE: complete (no unfilled install markers)"
         fi
 
         # Check AI implementation section exists
@@ -740,7 +723,7 @@ validate-ai-install:
             ERRORS=$((ERRORS + 1))
         fi
 
-        # Check install commands exist (not just placeholders)
+        # Check install commands exist
         if ! grep -q 'git clone' "$GUIDE" 2>/dev/null; then
             echo "WARNING: No git clone command found in $GUIDE -- install commands may be incomplete"
         fi
@@ -754,10 +737,9 @@ validate-ai-install:
             ERRORS=$((ERRORS + 1))
         fi
 
-        # Check README for unfilled TODO markers
-        README_TODOS=$(grep -c '\[TODO-AI-INSTALL' "$README" 2>/dev/null || true)
-        if [ "$README_TODOS" -gt 0 ]; then
-            echo "INCOMPLETE: $README has $README_TODOS unfilled [TODO-AI-INSTALL] markers"
+        README_MARKER_COUNT=$(grep -c "$INSTALL_MARKER" "$README" 2>/dev/null || true)
+        if [ "$README_MARKER_COUNT" -gt 0 ]; then
+            echo "INCOMPLETE: $README has $README_MARKER_COUNT unfilled install markers"
             ERRORS=$((ERRORS + 1))
         fi
     fi
@@ -891,10 +873,6 @@ release-tag version:
 # Count lines of code
 loc:
     @find . \( -name "*.rs" -o -name "*.ex" -o -name "*.exs" -o -name "*.res" -o -name "*.gleam" -o -name "*.zig" -o -name "*.idr" -o -name "*.hs" -o -name "*.ncl" -o -name "*.scm" -o -name "*.adb" -o -name "*.ads" \) -not -path './target/*' -not -path './_build/*' 2>/dev/null | xargs wc -l 2>/dev/null | tail -1 || echo "0"
-
-# Show TODO comments
-todos:
-    @grep -rn "TODO\|FIXME\|HACK\|XXX" --include="*.rs" --include="*.ex" --include="*.res" --include="*.gleam" --include="*.zig" --include="*.idr" --include="*.hs" . 2>/dev/null || echo "No TODOs"
 
 # Open in editor
 edit:

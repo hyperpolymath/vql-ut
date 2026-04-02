@@ -1,0 +1,11 @@
+= Aspect Test Surface
+
+The current aspect and edge-case slice is exercised through
+`tests/integration_test.rs` using the `aspect_`-prefixed Rust integration tests.
+
+Run it with:
+
+[source,bash]
+----
+just test-aspect
+----

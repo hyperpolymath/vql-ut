@@ -20,7 +20,11 @@ fn send_result<T: serde::Serialize>(
 ) -> Result<(), Box<dyn std::error::Error>> {
     match serde_json::to_value(result) {
         Ok(value) => {
-            let resp = Response { id, result: Some(value), error: None };
+            let resp = Response {
+                id,
+                result: Some(value),
+                error: None,
+            };
             connection.sender.send(Message::Response(resp))?;
         }
         Err(e) => {

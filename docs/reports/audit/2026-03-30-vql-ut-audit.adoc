@@ -1,0 +1,100 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= VQL-UT Audit Note (v2)
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:revdate: 2026-03-30
+
+This note records the second, stronger containment pass. The document is v2
+to signal that the audit is living work: we keep verifying claims, inviting
+challenge, and pushing the evidence boundary rather than letting the repo rest
+with unchecked assertions.
+
+== Summary
+
+Status: `fail`
+
+VQL-UT remains primarily a research prototype. The existing evidence covers the
+formatter/linter surface (levels 1–3) with integration tests, but the claimed
+10-level safety envelope, the Idris/Zig proof obligations, and the release-grade
+assertions are not yet matched by mechanised proofs, end-to-end executions, or
+production-ready automation. Template scaffolding, placeholder documentation,
+and LSP compilation failures continue to block any stable/publication charge.
+
+== Evidence log
+
+* `cargo clippy --workspace --all-targets -- -D warnings` (run via `just lint`)
+  fails because `src/interface/lsp/src/main.rs` is still using outdated async
+  patterns: `connection.initialize(...)` and `receiver.recv()` are awaited despite
+  returning synchronous `Result`s, and the helper `cast` function assumes
+  `request::Request` is a concrete type rather than a trait object. Clippy also
+  rejects the `mod lib;` declaration inside a binary because `lib.rs` is already
+  reserved for the library target.
+* `rg -n "TODO|FIXME|XXX|HACK|STUB|PARTIAL"` surfaces template markers in the
+  Containerfile, Guix/flake files, and container entrypoints, so naive audits still
+  trigger placeholder residue warnings even though real logic lives elsewhere.
+* `verification/proofs` contains nothing beyond an AI manifest stub; there are no
+  actual Idris2/Lean4/Agda proof scripts despite the paper's claims about
+  machine-checked 10-level guarantees.
+* The paper (`arcvix-10-level-query-safety.tex`) currently frames the decalogue
+  as a proposal with a prototype but still uses “type-level guarantees” language
+  that readers could misread as already enforced—contradicting the absence of
+  evidence beyond levels 1–3.
+* Integration tests (`tests/integration_test.rs`, 49 total) exercise the formatter
+  and linter only; there are no staged proofs or benchmarks for Idris/Zig safety
+  layers, nor is there a VeriSimDB execution harness, so the higher levels remain
+  speculative.
+
+== Confirmed blockers
+
+* Clippy/linting fails in `src/interface/lsp/src/main.rs` with nine compiler errors,
+  preventing `just lint` from passing and showing the LSP surface is not ready for
+  release-grade QA.
+* Container/workflow/Nix/Guix surfaces still contain TODO markers that are
+  flagged by marker scans and create audit noise that must be cleared before any
+  release.
+* No mechanised proofs exist in the repo despite the paper's claims; `verification/proofs`
+  is a stub manifest only.
+* Tests cover only the formatter/linter (levels 1–3); there is no evidence for
+  levels 4–10, nor is there e2e execution against VeriSimDB or proof-carrying
+  instrumentation.
+* The Zenodo DOI badge, README, and paper still mention the 10-level model and
+  verified safety guarantees, so a reviewer could mistake the repo for a
+  production-level system unless the wording is tightened further (even though
+  the README already notes the repo is a design prototype).
+
+== Containment actions taken
+
+* README, AI manifest, ROADMAP, and architecture docs were pulled back to honest
+  prototype language.
+* `.machine_readable/6a2/STATE.a2ml` now holds repo-specific state instead of
+  template metadata.
+* The paper front matter emphasises draft/proposal status and invites future
+  mechanisation.
+* Fake fuzz evidence was deleted and replaced with honest notes.
+* `Justfile` was wired to use real Rust commands and expose `test`, `test-e2e`,
+  `test-aspect`, `bench`, and `lint` recipes.
+
+== Immediate next actions
+
+* Update `lsp/src/main.rs` so Clippy passes: remove the illegal `mod lib;`,
+  stop `await`ing synchronous `Result`s, and align `handle_shutdown` calls with
+  the `lsp-server` API.
+* Eliminate remaining TODO markers in container/Guix/Nix workflows so marker
+  scans stop reporting template residue.
+* Start capturing actual mechanised proofs for the 10-level claims (Idris2/
+  Lean4/Agda). Without those scripts the paper's guarantee language remains
+  unsupported.
+* Expand the test/bench suite beyond the formatter/linter layer: add e2e flows
+  that exercise the schema/type-checker pipeline and stress VeriSimDB connectivity,
+  plus aspect coverage on security, concurrency, and resource constraints.
+* Tighten the paper and README wording so that any mentions of “guarantees” are
+  clearly scoped to the evidence, or remove the stronger claims until new proofs
+  are committed.
+
+== Invitation for review
+
+We treat this as a cross-community audit rather than an internal tick box. If you
+see additional gaps, contradictions, or opportunities to raise the quality of the
+material, annotate this document, open an issue, or start a discussion. We want
+to know why you think the current evidence is insufficient or how the repo would
+need to change to reach your own best-practice bar (CRG D→C→B→A). Being
+challenged sharpens the work.

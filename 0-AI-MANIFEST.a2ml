@@ -7,9 +7,13 @@
 
 ## WHAT IS THIS?
 
-This is the AI manifest for **vql-ut** (VQL Ultimate Type-Safe) — the 10-level
-type-safe query language for VeriSimDB. It supersedes VQL-DT (dependent types
-only) as THE formally verified query path.
+This is the AI manifest for **vql-ut** (VQL Ultimate Type-Safe), an experimental
+research repo for a proposed type-safe query layer for VeriSimDB.
+
+Do **not** describe this repository as a completed formally verified query path,
+as a production-ready system, or as a replacement for VQL-DT. The current repo
+contains surface tooling and draft proof-oriented components, not a finished
+end-to-end verified compiler.
 
 ## NAMING
 
@@ -40,10 +44,10 @@ TypeLL (type theory core)
 | Path | Purpose | Type Safety |
 |------|---------|-------------|
 | VQL (Slipstream) | Standard routine queries, fast | None (runtime only) |
-| VQL-DT | PROOF clauses (6 proof types) | Dependent types via Lean |
-| VQL-UT | All 10 levels, research → production | Full formal verification via Idris2 |
+| VQL-DT | PROOF clauses (6 proof types) | Existing proof-oriented path |
+| VQL-UT | Proposed 10-level successor path | Experimental repo: formatter/linter tests plus draft Idris2/Zig/ReScript work |
 
-If VQL-UT succeeds, it replaces VQL-DT entirely.
+If VQL-UT matures and earns it, it may eventually supersede VQL-DT. It has not done so yet.
 
 ### Adoption Path
 
@@ -82,11 +86,29 @@ These a2ml files MUST exist in `.machine_readable/` directory ONLY:
 2. **No `assert_total`** — All functions provably total via `%default total`.
 3. **No `assert_smaller`** — Termination proved structurally.
 4. **No SCM duplication** — `.machine_readable/` is authoritative.
-5. **Idris2 over Ephapax** — When proven Idris2 code conflicts with Ephapax
+5. **Evidence boundary honesty** — Do not claim end-to-end verification,
+   proof certificates, or production readiness unless the checked artifact
+   actually supports it.
+6. **Idris2 over Ephapax** — When proven Idris2 code conflicts with Ephapax
    linear types, always choose Idris2. Dependability first.
-6. **License** — PMPL-1.0-or-later throughout.
-7. **Author** — Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-8. **Container images** — Chainguard base, Podman, Containerfile.
+7. **License** — PMPL-1.0-or-later throughout.
+8. **Author** — Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+9. **Container images** — Chainguard base, Podman, Containerfile.
+
+## CURRENT EVIDENCE BOUNDARY
+
+Checked surfaces today:
+
+- Rust formatter/linter crates and integration tests
+- Draft Idris2 modules for the core safety model and ABI/FFI types
+- Early Zig/ReScript scaffolding
+
+Not yet claimable from this repo alone:
+
+- full 10-level enforcement at compile time
+- machine-checkable proof certificates for end-to-end execution
+- production readiness
+- replacement of VQL-DT in live VeriSimDB deployments
 
 ## THE 10 LEVELS OF TYPE SAFETY
 
@@ -146,7 +168,7 @@ defaults to empty and MUST be configured per-workspace.
 ## SESSION STARTUP CHECKLIST
 
 ✅ Read THIS file (0-AI-MANIFEST.a2ml) first
-✅ Understand: VQL-UT supersedes VQL-DT
-✅ Understand: 10 levels from TypeLL → PanLL → VQL-UT
+✅ Understand: VQL-UT is experimental and does not yet supersede VQL-DT
+✅ Understand: 10 levels from TypeLL → PanLL → VQL-UT are the intended design basis
 ✅ NEVER use vql++/vqlpp naming
 ✅ Canonical location: `.machine_readable/`

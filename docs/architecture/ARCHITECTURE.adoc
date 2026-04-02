@@ -6,24 +6,26 @@ Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 :toc: macro
 :toclevels: 3
 :icons: font
-:description: Comprehensive architecture document for VQL-UT (Verified Query Language — Unified Types)
+:description: Draft architecture document for VQL-UT (Verified Query Language — Unified Types)
 
 toc::[]
 
+NOTE: Audit status as of 2026-03-30: this document describes the target architecture. The current repository implements the formatter/linter surface plus draft Idris2/Zig components, but it does not yet realise the full six-stage pipeline or emit end-to-end proof certificates.
+
 == System Overview
 
-VQL-UT (Verified Query Language — Unified Types) is a dependently-typed query
-language compiler that produces machine-checkable proofs of query safety. It
-extends VQL-dt (VeriSimDB's existing dependent type system, ~35% wired) to
-cover the full spectrum of safety properties through 10 formally verified
-levels.
+VQL-UT (Verified Query Language — Unified Types) is a proposed dependently-typed
+query language/compiler architecture for VeriSimDB. The design goal is to cover
+10 progressive safety properties in a single system. The current repository is
+an early prototype and design vehicle, not a finished compiler that already
+produces machine-checkable proofs end to end.
 
-Every query entering VQL-UT passes through a six-stage pipeline. Each stage
-is responsible for enforcing one or more of the 10 safety levels. The pipeline
-output is not merely a compiled query — it is a *proof certificate* attesting
-that every safety property holds.
+In the intended architecture, every query entering VQL-UT would pass through a
+six-stage pipeline. Each stage would be responsible for enforcing one or more
+of the 10 safety levels. Proof-certificate output remains a design target, not
+an implemented release guarantee in the current repo.
 
-=== Pipeline: Parse → Bind → Check → Analyse → Compile → Execute
+=== Intended Pipeline: Parse → Bind → Check → Analyse → Compile → Execute
 
 [source]
 ----

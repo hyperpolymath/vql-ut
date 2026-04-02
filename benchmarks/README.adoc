@@ -1,0 +1,13 @@
+= Benchmark Surface
+
+The current benchmark surface is limited to stress-style smoke checks over the
+formatter/linter test harness.
+
+Run it with:
+
+[source,bash]
+----
+just bench
+----
+
+This is not yet a publication-grade performance benchmark suite.

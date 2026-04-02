@@ -39,7 +39,9 @@ pub fn lint_vqlut(content: &str) -> Vec<LintIssue> {
     // Check for uppercase keywords
     for (i, line) in content.lines().enumerate() {
         let line_num = i + 1;
-        let keywords = ["select", "from", "where", "group", "order", "having", "limit"];
+        let keywords = [
+            "select", "from", "where", "group", "order", "having", "limit",
+        ];
         for keyword in keywords {
             if line.to_lowercase().contains(&format!(" {} ", keyword)) {
                 issues.push(LintIssue {
