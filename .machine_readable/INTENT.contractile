@@ -1,5 +1,5 @@
 ; SPDX-License-Identifier: PMPL-1.0-or-later
-; INTENT.contractile — Purpose and scope for vql-ut
+; INTENT.contractile — Purpose and scope for vcl-total
 ; Helps LLM/SLM agents understand what this repo IS and IS NOT.
 ;
 ; Part of the contractile family: MUST, TRUST, DUST, INTENT, ADJUST
@@ -31,7 +31,7 @@
 
 (intent-contractile
   (version "1.0.0")
-  (repo "vql-ut")
+  (repo "vcl-total")
 
   ; === Purpose (what this repo IS) ===
   (purpose

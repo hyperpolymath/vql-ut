@@ -1,18 +1,18 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
-# VQL-UT Container Image
+# VCL-total Container Image
 #
 # Multi-stage build template for Chainguard Wolfi base images.
 # Customise the builder stage for your language and copy the
 # resulting binary/release into the minimal runtime stage.
 #
 # Build with Podman:
-#   podman build -t vql-ut:latest -f container/Containerfile .
+#   podman build -t vcl-total:latest -f container/Containerfile .
 #
 # Run:
-#   podman run -p 8080:8080 vql-ut:latest
+#   podman run -p 8080:8080 vcl-total:latest
 #
 # Run with persistent volume:
-#   podman run -p 8080:8080 -v vql-ut-data:/data vql-ut:latest
+#   podman run -p 8080:8080 -v vcl-total-data:/data vcl-total:latest
 
 # ============================================================================
 # Stage 1: Builder
@@ -29,7 +29,7 @@
 #   COPY Cargo.toml Cargo.lock ./
 #   COPY src/ ./src/
 #   RUN cargo build --release
-#   # Output: /build/target/release/vql-ut
+#   # Output: /build/target/release/vcl-total
 #
 # --- Elixir ---
 #   RUN apk add --no-cache erl27-elixir-1.18 erlang-27 erlang-27-dev git build-base
@@ -39,14 +39,14 @@
 #   ENV MIX_ENV=prod
 #   RUN mix local.hex --force && mix local.rebar --force && \
 #       mix deps.get --only prod && mix compile && mix release
-#   # Output: /build/_build/prod/rel/vql-ut/
+#   # Output: /build/_build/prod/rel/vcl-total/
 #
 # --- Zig ---
 #   RUN apk add --no-cache zig build-base
 #   COPY build.zig build.zig.zon ./
 #   COPY src/ ./src/
 #   RUN zig build -Doptimize=ReleaseFast
-#   # Output: /build/zig-out/bin/vql-ut
+#   # Output: /build/zig-out/bin/vcl-total
 #
 FROM cgr.dev/chainguard/wolfi-base:latest AS builder
 
@@ -69,8 +69,8 @@ COPY . .
 FROM cgr.dev/chainguard/wolfi-base:latest
 
 # OCI image labels (compatible with cerro-torre .ctp bundle metadata)
-LABEL org.opencontainers.image.title="VQL-UT" \
-      org.opencontainers.image.description="VQL Ultimate Type-Safety — 10-level query safety checker for VeriSimDB" \
+LABEL org.opencontainers.image.title="VCL-total" \
+      org.opencontainers.image.description="VCL Ultimate Type-Safety — 10-level query safety checker for VeriSimDB" \
       org.opencontainers.image.url="https://github.com/hyperpolymath/vql-ut" \
       org.opencontainers.image.source="https://github.com/hyperpolymath/vql-ut" \
       org.opencontainers.image.vendor="hyperpolymath" \
@@ -96,9 +96,9 @@ WORKDIR /app
 
 # TODO: Copy compiled binary/release from builder stage.
 # Examples:
-#   COPY --from=builder /build/target/release/vql-ut /app/vql-ut
-#   COPY --from=builder /build/_build/prod/rel/vql-ut /app/release/
-#   COPY --from=builder /build/zig-out/bin/vql-ut /app/vql-ut
+#   COPY --from=builder /build/target/release/vcl-total /app/vcl-total
+#   COPY --from=builder /build/_build/prod/rel/vcl-total /app/release/
+#   COPY --from=builder /build/zig-out/bin/vcl-total /app/vcl-total
 
 # Copy entrypoint script
 COPY container/entrypoint.sh /app/entrypoint.sh

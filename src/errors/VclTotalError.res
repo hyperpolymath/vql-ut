@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 
-/// VQL-UT error types matching the ABI error codes.
+/// VCL-total error types matching the ABI error codes.
 ///
 /// Each error carries a safety level where the failure occurred,
 /// a human-readable message, and an optional source location.
 
-/// Source location in a VQL-UT query string.
+/// Source location in a VCL-total query string.
 type sourceLocation = {
   offset: int,
   line: int,
   column: int,
 }
 
-/// The 11 error categories matching VqlUtError in Types.idr.
+/// The 11 error categories matching VclTotalError in Types.idr.
 type errorCode =
   | ParseError        // Level 0: syntax error
   | SchemaError       // Level 1: unresolved field reference
@@ -26,7 +26,7 @@ type errorCode =
   | LinearityViolation // Level 9: use-count exceeded
   | InternalError     // Internal checker error
 
-/// A VQL-UT diagnostic error.
+/// A VCL-total diagnostic error.
 type diagnostic = {
   code: errorCode,
   level: int,        // Safety level (0-9) where the error occurred

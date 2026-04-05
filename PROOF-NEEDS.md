@@ -30,7 +30,7 @@
 - Debug adapter and formatter — lower priority but should preserve query semantics
 
 ### ReScript Bridge (src/bridges/)
-- `VqlUtParser.res`, `VqlUtBridge.res` — bridge between ReScript frontend and Idris2/Rust core
+- `VclTotalParser.res`, `VclTotalBridge.res` — bridge between ReScript frontend and Idris2/Rust core
 - Prove: bridge faithfully translates between ReScript and core representations
 
 ## Recommended Prover

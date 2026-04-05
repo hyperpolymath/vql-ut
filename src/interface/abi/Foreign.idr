@@ -14,10 +14,10 @@
 ||| All functions are declared here with type signatures.
 ||| Implementations live in ffi/zig/src/main.zig
 
-module VqlUt.ABI.Foreign
+module VclTotal.ABI.Foreign
 
-import VqlUt.ABI.Types
-import VqlUt.ABI.Layout
+import VclTotal.ABI.Types
+import VclTotal.ABI.Layout
 
 %default total
 
@@ -51,20 +51,20 @@ abiVersion = do
 ||| @param query  Pointer to null-terminated VCL query string
 ||| @param mode   QueryMode tag (0=Slipstream, 1=DependentTypes, 2=UltimateTypeSafe)
 ||| @param outHandle  Out-pointer: receives parse tree handle on success
-||| @return VqlUtError tag (0=Ok, 1=ParseError, ...)
+||| @return VclTotalError tag (0=Ok, 1=ParseError, ...)
 export
 %foreign "C:vqlut_parse, libvqlut"
 prim__parse : Bits64 -> Bits32 -> Bits64 -> PrimIO Bits32
 
 ||| Safe wrapper: parse a query string.
-||| Returns a QueryHandle on success, or a VqlUtError on failure.
+||| Returns a QueryHandle on success, or a VclTotalError on failure.
 export
-parse : String -> QueryMode -> IO (Either VqlUtError QueryHandle)
+parse : String -> QueryMode -> IO (Either VclTotalError QueryHandle)
 parse query mode = do
   -- NOTE: In real usage, query string must be passed as a C string pointer.
   -- This wrapper demonstrates the calling convention.
   result <- primIO (prim__parse 0 (queryModeToInt mode) 0)
-  case intToVqlUtError result of
+  case intToVclTotalError result of
     Just Ok => pure (Left InternalError) -- placeholder: real impl uses out-pointer
     Just err => pure (Left err)
     Nothing => pure (Left InternalError)
@@ -79,7 +79,7 @@ parse query mode = do
 ||| @param parseTree   Handle from vqlut_parse
 ||| @param schemaHandle Handle to a loaded schema object
 ||| @param outHandle   Out-pointer: receives bound tree handle on success
-||| @return VqlUtError tag
+||| @return VclTotalError tag
 export
 %foreign "C:vqlut_bind_schema, libvqlut"
 prim__bindSchema : Bits64 -> Bits64 -> Bits64 -> PrimIO Bits32
@@ -94,7 +94,7 @@ prim__bindSchema : Bits64 -> Bits64 -> Bits64 -> PrimIO Bits32
 |||
 ||| @param boundTree  Handle from vqlut_bind_schema
 ||| @param outHandle  Out-pointer: receives typed tree handle on success
-||| @return VqlUtError tag
+||| @return VclTotalError tag
 export
 %foreign "C:vqlut_check_types, libvqlut"
 prim__checkTypes : Bits64 -> Bits64 -> PrimIO Bits32
@@ -108,7 +108,7 @@ prim__checkTypes : Bits64 -> Bits64 -> PrimIO Bits32
 |||
 ||| @param typedTree  Handle from vqlut_check_types
 ||| @param outHandle  Out-pointer: receives annotated tree handle on success
-||| @return VqlUtError tag
+||| @return VclTotalError tag
 export
 %foreign "C:vqlut_check_effects, libvqlut"
 prim__checkEffects : Bits64 -> Bits64 -> PrimIO Bits32
@@ -124,7 +124,7 @@ prim__checkEffects : Bits64 -> Bits64 -> PrimIO Bits32
 ||| @param annotatedTree  Handle from vqlut_check_effects
 ||| @param outPlan        Out-pointer: receives query plan buffer pointer
 ||| @param outPlanSize    Out-pointer: receives plan buffer size in bytes
-||| @return VqlUtError tag
+||| @return VclTotalError tag
 export
 %foreign "C:vqlut_compile, libvqlut"
 prim__compile : Bits64 -> Bits64 -> Bits64 -> PrimIO Bits32
@@ -191,9 +191,9 @@ lastError = do
     then pure Nothing
     else pure (Just (prim__getString ptr))
 
-||| Get human-readable description for a VqlUtError
+||| Get human-readable description for a VclTotalError
 export
-errorDescription : VqlUtError -> String
+errorDescription : VclTotalError -> String
 errorDescription Ok                     = "Success"
 errorDescription ParseError             = "Query failed to parse"
 errorDescription SchemaError            = "Schema reference not found"

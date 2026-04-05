@@ -16,11 +16,11 @@
 |||   - Totality: the checker terminates for all inputs
 |||   - Monotonicity: additional checks can only raise, never lower, the level
 
-module VqlUt.Core.Levels
+module VclTotal.Core.Levels
 
-import VqlUt.ABI.Types
-import VqlUt.Core.Grammar
-import VqlUt.Core.Schema
+import VclTotal.ABI.Types
+import VclTotal.Core.Grammar
+import VclTotal.Core.Schema
 import Data.List
 import Data.Nat
 

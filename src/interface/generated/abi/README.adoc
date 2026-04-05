@@ -3,5 +3,5 @@
 = VCL-total Generated ABI Headers
 
 C header files generated from the Idris2 ABI definitions, declaring the
-VCL-total query pipeline functions, SafetyLevel/QueryMode/VqlUtError enums,
+VCL-total query pipeline functions, SafetyLevel/QueryMode/VclTotalError enums,
 and the QueryPlanHeader struct.

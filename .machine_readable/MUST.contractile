@@ -1,5 +1,5 @@
 ; SPDX-License-Identifier: PMPL-1.0-or-later
-; MUST.contractile — Baseline invariants for vql-ut
+; MUST.contractile — Baseline invariants for vcl-total
 ; These constraints MUST NOT be violated. K9 validators enforce them.
 ;
 ; Part of the contractile family: MUST, TRUST, DUST, INTENT, ADJUST
@@ -33,7 +33,7 @@
 
 (must-contractile
   (version "1.0.0")
-  (repo "vql-ut")
+  (repo "vcl-total")
 
   ; === Universal Invariants (apply to ALL repos) ===
 

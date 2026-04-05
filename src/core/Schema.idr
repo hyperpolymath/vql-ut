@@ -14,10 +14,10 @@
 |||   - Schema compatibility is decidable
 |||   - Null propagation is tracked through expressions
 
-module VqlUt.Core.Schema
+module VclTotal.Core.Schema
 
-import VqlUt.ABI.Types
-import VqlUt.Core.Grammar
+import VclTotal.ABI.Types
+import VclTotal.Core.Grammar
 import Data.List
 
 %default total

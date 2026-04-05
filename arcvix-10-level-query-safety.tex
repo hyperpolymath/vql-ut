@@ -54,7 +54,7 @@
 \definecolor{typecolor}{RGB}{128,0,128}
 \definecolor{bglight}{RGB}{248,248,248}
 
-\lstdefinelanguage{VQL}{
+\lstdefinelanguage{VCL}{
   keywords={SELECT,FROM,WHERE,TYPED,BY,RETURNS,EXPECTING,EFFECTS,FRESH,
             WITHIN,CONSUME,AFTER,USE,SESSION,USAGE,LIMIT,PROOF,
             EXACTLY,AT_MOST,AT_LEAST,MANY,BETWEEN,AND,OR,NOT,
@@ -121,7 +121,7 @@
 % ============================================================================
 % Macros
 % ============================================================================
-\newcommand{\VQL}{\textsc{VQL-UT}}
+\newcommand{\VCL}{\textsc{VCL-total}}
 \newcommand{\VeriSimDB}{\textsc{VeriSimDB}}
 \newcommand{\TypeLL}{\textsc{TypeLL}}
 \newcommand{\PanLL}{\textsc{PanLL}}
@@ -178,7 +178,7 @@ type-level invariants in a dependently-typed query language and that the
 ten levels together form a bounded lattice under the subsumption
 ordering.
 
-We present \VQL{}, a query language for the multi-modal database
+We present \VCL{}, a query language for the multi-modal database
 \VeriSimDB{}, in which all ten levels are enforced at compile time
 through a combination of dependent types, quantitative type theory,
 algebraic effect systems, and session types.  We provide formal
@@ -233,7 +233,7 @@ This paper makes three contributions:
     definitions and demonstrate their encodability in a dependently-typed
     core calculus.
 
-  \item \textbf{A Concrete Realisation.}  We present \VQL{}, a query
+  \item \textbf{A Concrete Realisation.}  We present \VCL{}, a query
     language for the \VeriSimDB{} multi-modal database system, in which
     all ten levels are enforced at compile time.  The verification core
     is implemented in Idris\,2; the parser front-end in ReScript; and
@@ -247,7 +247,7 @@ This paper makes three contributions:
 \Cref{sec:typesystem} describes the type system design.
 \Cref{sec:multimodal} discusses integration with multi-modal databases.
 \Cref{sec:implementation} covers the implementation architecture.
-\Cref{sec:comparison} compares \VQL{} with existing query languages.
+\Cref{sec:comparison} compares \VCL{} with existing query languages.
 \Cref{sec:future} outlines future work.
 \Cref{sec:conclusion} concludes.
 
@@ -273,7 +273,7 @@ into a new query) and rely on correct usage by the programmer---a form
 of \emph{safety by convention} rather than \emph{safety by
 construction}.
 
-\VQL{} addresses this at Level~5 (injection-proof safety) by making
+\VCL{} addresses this at Level~5 (injection-proof safety) by making
 the separation structural: user input and query syntax inhabit
 different types that cannot be combined.  There is no function
 $\mathit{String} \to \mathit{Query}$; the only path from text to query
@@ -315,7 +315,7 @@ type theory (QTT), which we exploit for linear resource tracking at
 Level~10.
 
 The key distinction of our work is \emph{unification}: where prior
-systems address subsets of the safety levels, \VQL{} addresses all ten
+systems address subsets of the safety levels, \VCL{} addresses all ten
 within a single type-theoretic framework, and crucially, formalises the
 subsumption ordering that relates them.
 
@@ -381,7 +381,7 @@ refer to the predicate that characterises it.
 
 \begin{definition}[\Safe{1}: Parse-Time Safety]
 A query $q$ is \Safe{1}-safe if and only if $q$ is a member of the
-language $\mathcal{L}(G)$ defined by the VQL-UT grammar $G$.
+language $\mathcal{L}(G)$ defined by the VCL-total grammar $G$.
 Formally:
 \[
   \Safe{1}(q) \iff q \in \mathcal{L}(G)
@@ -396,8 +396,8 @@ The parser is the first line of defence: it rejects malformed input
 before any semantic analysis occurs.
 
 \paragraph{Mechanism.}
-The \VQL{} parser, written in ReScript, implements a recursive-descent
-parser for the VQL-UT grammar (defined in EBNF).  A successful parse
+The \VCL{} parser, written in ReScript, implements a recursive-descent
+parser for the VCL-total grammar (defined in EBNF).  A successful parse
 produces a typed abstract syntax tree (AST); failure produces a
 structured error with position information and suggestions.
 
@@ -410,7 +410,7 @@ name containing raw SQL causes a school database to execute
 \texttt{DROP TABLE students}.
 
 \begin{example}
-\begin{lstlisting}[language=VQL]
+\begin{lstlisting}[language=VCL]
 -- Rejected at Level 1: syntax error
 SELCT users WHERE id = 1
 -- Error: Unknown keyword "SELCT" at position 0.
@@ -461,7 +461,7 @@ mode that can persist undetected for months in production
 \citep{kim2013silent}.
 
 \begin{example}
-\begin{lstlisting}[language=VQL]
+\begin{lstlisting}[language=VCL]
 -- Schema: users(id: UUID, name: String, email: String?)
 SELECT DOCUMENT.emial FROM HEXAD ...
   TYPED BY users@1.0
@@ -505,7 +505,7 @@ due to absent type distinctions, resulted in patient deaths
 \citep{leveson1993therac}.
 
 \begin{example}
-\begin{lstlisting}[language=VQL]
+\begin{lstlisting}[language=VCL]
 -- Rejected at Level 3: type incompatibility
 SELECT DOCUMENT.name FROM HEXAD ...
   WHERE DOCUMENT.name > 42
@@ -556,7 +556,7 @@ These semantics, while internally consistent, violate the expectations
 of most programmers and are a leading source of silent data corruption.
 
 \begin{example}
-\begin{lstlisting}[language=VQL]
+\begin{lstlisting}[language=VCL]
 -- Schema: users.email is Nullable(String)
 SELECT UPPER(DOCUMENT.email) FROM HEXAD ...
 -- Level 4 error: UPPER expects String, got Nullable(String).
@@ -588,7 +588,7 @@ impossibility.  The type system makes it impossible for user input to
 be interpreted as query syntax, because the two inhabit disjoint types.
 
 \paragraph{Mechanism.}
-Parameters in \VQL{} are typed slots: \texttt{\$id :: UUID} declares a
+Parameters in \VCL{} are typed slots: \texttt{\$id :: UUID} declares a
 parameter of type \texttt{UUID}.  The only way to supply a value is
 through the typed parameter-binding API.  There is no string
 interpolation operator and no \texttt{eval} function.  The parser is
@@ -600,11 +600,11 @@ Injection attacks---the persistent \#1 web application vulnerability
 records through an injection vector \citep{usgao2018equifax}.
 
 \begin{example}
-\begin{lstlisting}[language=VQL]
--- VQL-UT: injection impossible by construction
+\begin{lstlisting}[language=VCL]
+-- VCL-total: injection impossible by construction
 SELECT DOCUMENT.* FROM HEXAD ...
   WHERE DOCUMENT.id = $id :: UUID
--- $id is Param(UUID), not a string. Cannot contain VQL commands.
+-- $id is Param(UUID), not a string. Cannot contain VCL commands.
 -- The type system prevents: $id = "'; DROP TABLE users; --"
 \end{lstlisting}
 \end{example}
@@ -633,7 +633,7 @@ that does not include \texttt{salary}---the column is absent from the
 type, not merely masked at runtime.
 
 \paragraph{Mechanism.}
-The \VQL{} type system parameterises queries by a permission context,
+The \VCL{} type system parameterises queries by a permission context,
 represented as a dependent type that encodes which columns and rows the
 current principal may access.  The result type is computed as the
 intersection of the selected fields and the permitted fields.
@@ -708,7 +708,7 @@ emails exist (due to a missing unique constraint), the system
 authenticates against the wrong account.
 
 \begin{example}
-\begin{lstlisting}[language=VQL]
+\begin{lstlisting}[language=VCL]
 SELECT DOCUMENT.* FROM HEXAD ...
   WHERE DOCUMENT.id = $id :: UUID
   EXPECTING EXACTLY 1
@@ -779,7 +779,7 @@ performing writes.  Effect tracking makes this category of error
 impossible.
 
 \begin{example}
-\begin{lstlisting}[language=VQL]
+\begin{lstlisting}[language=VCL]
 SELECT DOCUMENT.total FROM HEXAD ...
   EFFECTS { Read }
 -- Accepted: SELECT is a read operation.
@@ -850,7 +850,7 @@ was recorded in the database).  Temporal safety distinguishes these
 at the type level, preventing accidental conflation.
 
 \begin{example}
-\begin{lstlisting}[language=VQL]
+\begin{lstlisting}[language=VCL]
 SELECT DOCUMENT.price FROM HEXAD ...
   WHERE DOCUMENT.ticker = "FTSE100"
   AS OF NOW - 5 SECONDS
@@ -926,7 +926,7 @@ provenance chains are maintained through query compositions and that
 results from the provenance modality carry verifiable attestations.
 
 \begin{example}
-\begin{lstlisting}[language=VQL]
+\begin{lstlisting}[language=VCL]
 SELECT DOCUMENT.*, PROVENANCE.chain
   FROM HEXAD 3f2504e0-...
   PROOF PROVENANCE(audit_trail)
@@ -1025,7 +1025,7 @@ but not~4 has a safety score of~3, because the chain is broken at~4.
 \section{Type System Design}\label{sec:typesystem}
 % ============================================================================
 
-\VQL{}'s type system is built on four pillars, each contributing to
+\VCL{}'s type system is built on four pillars, each contributing to
 specific safety levels:
 
 \begin{center}
@@ -1238,11 +1238,11 @@ the proof search fails and the query is rejected at compile time.
 
 \VeriSimDB{} supports \emph{drift detection}: when the same logical
 entity has representations in multiple modalities that have diverged,
-the drift is quantified and reported.  The VQL-UT grammar includes
+the drift is quantified and reported.  The VCL-total grammar includes
 drift policies (\texttt{STRICT}, \texttt{REPAIR}, \texttt{TOLERATE},
 \texttt{LATEST}) that are reflected in the query's type:
 
-\begin{lstlisting}[language=VQL]
+\begin{lstlisting}[language=VCL]
 SELECT DOCUMENT.*, VECTOR.embedding
   FROM FEDERATION /universities/*
   WITH DRIFT STRICT
@@ -1258,7 +1258,7 @@ SELECT DOCUMENT.*, VECTOR.embedding
 
 \subsection{Architecture}
 
-The \VQL{} implementation comprises four layers:
+The \VCL{} implementation comprises four layers:
 
 \begin{center}
 \begin{tikzpicture}[
@@ -1289,7 +1289,7 @@ The \VQL{} implementation comprises four layers:
 \subsection{Parser (ReScript)}
 
 The parser is a recursive-descent parser written in ReScript, extending
-\VeriSimDB{}'s existing VQL v3.0 parser with the type-safety clauses
+\VeriSimDB{}'s existing VCL v3.0 parser with the type-safety clauses
 introduced in \Cref{sec:decalogue}.  ReScript was chosen for its strong
 type inference, pattern matching, and compilation to efficient
 JavaScript (enabling browser-based query editors with client-side
@@ -1397,7 +1397,7 @@ Ur/Web             & \checkmark & \checkmark & \checkmark & \checkmark & \checkm
 EdgeQL             & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & $\sim$     & $\sim$     & \texttimes & \texttimes & \texttimes & 5 \\
 PRQL               & \checkmark & $\sim$     & $\sim$     & \texttimes & \checkmark & \texttimes & \texttimes & \texttimes & \texttimes & \texttimes & 1 \\
 Malloy             & \checkmark & \checkmark & \checkmark & $\sim$     & \checkmark & \texttimes & \texttimes & \texttimes & \texttimes & \texttimes & 3 \\
-\textbf{VQL-UT}    & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \textbf{10} \\
+\textbf{VCL-total}    & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \textbf{10} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1472,12 +1472,12 @@ taxonomic contribution of this paper.
 \section{Formal Properties}\label{sec:formal}
 % ============================================================================
 
-We state several key properties of the \VQL{} type system.  Full
+We state several key properties of the \VCL{} type system.  Full
 proofs are mechanised in Idris\,2 and available in the supplementary
 material.
 
 \begin{theorem}[Type Soundness]
-If a \VQL{} query $q$ type-checks at safety level $k$, then
+If a \VCL{} query $q$ type-checks at safety level $k$, then
 execution of $q$ will not exhibit any failure mode associated with
 levels $1$ through $k$.
 \end{theorem}
@@ -1529,19 +1529,19 @@ not \emph{checked}---they need not be verified again at runtime.
 
 \subsection{Automated Level Inference}
 
-Currently, \VQL{} queries may include explicit annotations for
+Currently, \VCL{} queries may include explicit annotations for
 higher safety levels (e.g., \texttt{EXPECTING EXACTLY 1},
 \texttt{EFFECTS \{Read\}}).  We plan to implement \emph{automatic
 level inference}: the compiler determines the highest safety level
 a query satisfies without explicit annotations, and reports this as a
 ``safety score'' alongside the type-checking result.  This would
-enable gradual adoption: existing VQL queries are assigned scores
+enable gradual adoption: existing VCL queries are assigned scores
 without modification, and developers incrementally add annotations to
 raise their scores.
 
 \subsection{Safety Certificate Generation}
 
-We envision \VQL{} producing \emph{safety certificates}---machine-readable
+We envision \VCL{} producing \emph{safety certificates}---machine-readable
 proofs that a query satisfies a given safety level.  These certificates
 could be:
 \begin{itemize}[nosep]
@@ -1555,7 +1555,7 @@ could be:
 
 \subsection{Cross-Language Safety Propagation}
 
-When a \VQL{} query is embedded in a host language (ReScript, Elixir,
+When a \VCL{} query is embedded in a host language (ReScript, Elixir,
 Rust), the safety guarantees should propagate to the host.  For
 example, a Level~7 (\texttt{ExactlyOne}) result should be represented
 as a non-optional type in ReScript, not as a list that the caller
@@ -1607,7 +1607,7 @@ failure modes but a \emph{chain}: each class of bug presupposes the
 absence of all less severe classes.  This total ordering enables a
 meaningful ``safety score'' for any query language---the highest level
 at which the chain is unbroken.  Existing query languages achieve
-scores between 0 and~6.  \VQL{}, through its combination of dependent
+scores between 0 and~6.  \VCL{}, through its combination of dependent
 types, algebraic effects, refinement types, and quantitative type
 theory, achieves a score of~10.
 
@@ -1623,7 +1623,7 @@ The theoretical consequence is a framework for classifying and
 comparing query language safety properties.  The decalogue provides a
 common vocabulary for discussing what a query language guarantees, what
 it leaves to convention, and what it cannot address.  We hope this
-taxonomy proves useful beyond the specific context of \VQL{} and
+taxonomy proves useful beyond the specific context of \VCL{} and
 \VeriSimDB{}, as a tool for reasoning about the safety of any system
 that transforms data.
 
@@ -1824,9 +1824,9 @@ Weirich, S., Voizard, A., de~Amorim, P. H.~A., and Eisenberg, R.~A. (2017).
 % ============================================================================
 \appendix
 
-\section{VQL-UT Grammar (EBNF Extract)}\label{app:grammar}
+\section{VCL-total Grammar (EBNF Extract)}\label{app:grammar}
 
-The following is an abbreviated extract of the VQL-UT grammar,
+The following is an abbreviated extract of the VCL-total grammar,
 showing the top-level structure and the type-safety clauses.  The
 complete grammar (583 lines of EBNF) is available in the project
 repository.

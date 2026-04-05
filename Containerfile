@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
-# Containerfile for VQL-UT
-# Build: podman build -t vql_ut:latest -f Containerfile .
-# Run:   podman run --rm -it vql_ut:latest
-# Seal:  selur seal vql_ut:latest
+# Containerfile for VCL-total
+# Build: podman build -t vcl_total:latest -f Containerfile .
+# Run:   podman run --rm -it vcl_total:latest
+# Seal:  selur seal vcl_total:latest
 
 # --- Build stage ---
 FROM cgr.dev/chainguard/wolfi-base:latest AS build
@@ -30,12 +30,12 @@ FROM cgr.dev/chainguard/static:latest
 # Copy built artifact from build stage
 # TODO: Replace with your binary/artifact path
 # Examples:
-#   COPY --from=build /build/target/release/vql_ut /usr/local/bin/
-#   COPY --from=build /build/_build/prod/rel/vql_ut /app/
-#   COPY --from=build /build/zig-out/bin/vql_ut /usr/local/bin/
+#   COPY --from=build /build/target/release/vcl_total /usr/local/bin/
+#   COPY --from=build /build/_build/prod/rel/vcl_total /app/
+#   COPY --from=build /build/zig-out/bin/vcl_total /usr/local/bin/
 
 # Non-root user (chainguard images default to nonroot)
 USER nonroot
 
 # TODO: Replace with your entrypoint
-# ENTRYPOINT ["/usr/local/bin/vql_ut"]
+# ENTRYPOINT ["/usr/local/bin/vcl_total"]

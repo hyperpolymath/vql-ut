@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 //
-// VQL-UT Recursive Descent Parser — ReScript implementation
+// VCL-total Recursive Descent Parser — ReScript implementation
 //
-// Parses VQL-UT query strings into the AST defined in VqlUtAst.res.
+// Parses VCL-total query strings into the AST defined in VclTotalAst.res.
 // The parser operates in two phases:
 //
 //   1. Tokenisation: splits the input on whitespace and punctuation,
-//      preserving quoted strings and recognising VQL-UT keywords.
+//      preserving quoted strings and recognising VCL-total keywords.
 //   2. Recursive descent: walks the token stream to build a Statement.
 //
-// The parser sets `requestedLevel` based on which VQL-UT extension
+// The parser sets `requestedLevel` based on which VCL-total extension
 // clauses are present in the query, using the highest applicable level:
 //
 //   - No extensions:       ParseSafe       (Level 0)
@@ -27,7 +27,7 @@
 //            [proof_clause] [effect_clause] [version_clause]
 //            [linear_clause]
 
-open VqlUtAst
+open VclTotalAst
 
 // ═══════════════════════════════════════════════════════════════════════
 // Token type
@@ -82,7 +82,7 @@ let isPunct = (c: string): bool =>
   c == "(" || c == ")" || c == "," || c == "." || c == "*" ||
   c == "{" || c == "}" || c == "=" || c == "<" || c == ">" || c == "!"
 
-/// Tokenise a VQL-UT query string into an array of tokens.
+/// Tokenise a VCL-total query string into an array of tokens.
 ///
 /// Rules:
 /// - Whitespace is skipped (not emitted as tokens)
@@ -301,7 +301,7 @@ let parseModality = (name: string): option<modality> =>
   | _ => None
   }
 
-/// Check whether a word is a VQL-UT keyword (case-insensitive).
+/// Check whether a word is a VCL-total keyword (case-insensitive).
 /// Keywords cannot be used as field names or identifiers.
 let isKeyword = (word: string): bool => {
   let upper = String.toUpperCase(word)
@@ -917,7 +917,7 @@ and parseLinearClause = (state: parserState, keyword: string): result<linearAnno
 // Statement parsing
 // ═══════════════════════════════════════════════════════════════════════
 
-/// Parse a complete VQL-UT statement from the current token position.
+/// Parse a complete VCL-total statement from the current token position.
 ///
 /// This is the core of the recursive descent parser. It expects:
 ///   SELECT select_items FROM source [WHERE expr] [GROUP BY fields]
@@ -1055,7 +1055,7 @@ and parseStatementInner = (state: parserState): result<statement, string> => {
     None
   }
 
-  // ── VQL-UT extension clauses (optional, order-independent) ──
+  // ── VCL-total extension clauses (optional, order-independent) ──
   let proofClause: ref<option<proofClause>> = ref(None)
   let effectDecl: ref<option<effectDecl>> = ref(None)
   let versionConst: ref<option<versionConstraint>> = ref(None)
@@ -1141,7 +1141,7 @@ and parseStatementInner = (state: parserState): result<statement, string> => {
 // Public API
 // ═══════════════════════════════════════════════════════════════════════
 
-/// Parse a VQL-UT query string into a typed Statement AST.
+/// Parse a VCL-total query string into a typed Statement AST.
 ///
 /// This is the main entry point for the parser. It tokenises the input
 /// string, then runs the recursive descent parser to produce a Statement.
@@ -1183,7 +1183,7 @@ let parse = (input: string): result<statement, string> => {
   }
 }
 
-/// Tokenise a VQL-UT query string without parsing.
+/// Tokenise a VCL-total query string without parsing.
 /// Useful for debugging and syntax highlighting.
 ///
 /// Returns the array of tokens produced by the lexer.

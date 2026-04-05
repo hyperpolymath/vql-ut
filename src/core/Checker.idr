@@ -14,11 +14,11 @@
 ||| @see Grammar.idr for Statement / Expr AST definitions
 ||| @see Schema.idr for OctadSchema / resolveFieldRef
 
-module VqlUt.Core.Checker
+module VclTotal.Core.Checker
 
-import VqlUt.ABI.Types
-import VqlUt.Core.Grammar
-import VqlUt.Core.Schema
+import VclTotal.ABI.Types
+import VclTotal.Core.Grammar
+import VclTotal.Core.Schema
 import Data.List
 import Data.Maybe
 

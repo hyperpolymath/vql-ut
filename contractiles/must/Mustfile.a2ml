@@ -65,7 +65,7 @@ that MUST hold at all times.
 
 ### bridge-parser
 - description: The ReScript parser bridge file remains tracked.
-- run: test -f src/bridges/VqlUtParser.res
+- run: test -f src/bridges/VclTotalParser.res
 - severity: critical
 
 ### no-template-placeholders

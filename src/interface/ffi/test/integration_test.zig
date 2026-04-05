@@ -78,16 +78,16 @@ test "multiple concurrent handles are independent" {
 
 test "null handle returns error on all pipeline stages" {
     const bind_result = ffi.vqlut_bind_schema(0, 0, 0);
-    try testing.expectEqual(@intFromEnum(ffi.VqlUtError.internal_error), bind_result);
+    try testing.expectEqual(@intFromEnum(ffi.VclTotalError.internal_error), bind_result);
 
     const type_result = ffi.vqlut_check_types(0, 0);
-    try testing.expectEqual(@intFromEnum(ffi.VqlUtError.internal_error), type_result);
+    try testing.expectEqual(@intFromEnum(ffi.VclTotalError.internal_error), type_result);
 
     const effect_result = ffi.vqlut_check_effects(0, 0);
-    try testing.expectEqual(@intFromEnum(ffi.VqlUtError.internal_error), effect_result);
+    try testing.expectEqual(@intFromEnum(ffi.VclTotalError.internal_error), effect_result);
 
     const compile_result = ffi.vqlut_compile(0, 0, 0);
-    try testing.expectEqual(@intFromEnum(ffi.VqlUtError.internal_error), compile_result);
+    try testing.expectEqual(@intFromEnum(ffi.VclTotalError.internal_error), compile_result);
 }
 
 test "out-of-order pipeline stages return error" {
@@ -97,7 +97,7 @@ test "out-of-order pipeline stages return error" {
 
     // Try to compile without binding schema — should fail
     const result = ffi.vqlut_compile(handle, 0, 0);
-    try testing.expectEqual(@intFromEnum(ffi.VqlUtError.internal_error), result);
+    try testing.expectEqual(@intFromEnum(ffi.VclTotalError.internal_error), result);
 
     ffi.vqlut_destroy(handle);
 }

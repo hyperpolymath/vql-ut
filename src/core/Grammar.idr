@@ -18,9 +18,9 @@
 |||   2. Well-formedness predicates (structurally valid queries)
 |||   3. Type annotations at every expression node
 
-module VqlUt.Core.Grammar
+module VclTotal.Core.Grammar
 
-import VqlUt.ABI.Types
+import VclTotal.ABI.Types
 import Data.List
 import Data.Fin
 

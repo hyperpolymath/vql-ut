@@ -12,49 +12,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Renamed
 
-**VQL-UT → VCL-total** (2026-04-05). Full repo-wide migration of the project
-identity, carried out as part of the ecosystem-wide `VQL → VCL` reframing:
+**V{Q→C}L-{UT→total}** (2026-04-05). Full repo-wide migration of the project
+identity, carried out as part of the ecosystem-wide query-language → consonance-language
+reframing:
 
-- **VQL → VCL**: *VeriSim Query Language* → *VeriSim Consonance Language*.
+- **Q → C**: *VeriSim Query Language* → *VeriSim Consonance Language*.
   Verisim operations are **propositions to a consonance engine**, not queries
   against a passive store. Operations split into propositional (`DECLARE`,
   `ASSERT`, `RETRACT`) and epistemic (`INSPECT`, `VERIFY`).
-- **-UT → -total**: the `-ut` ("Ultimate Type-safe") suffix becomes `-total`,
+- **UT → total**: the "Ultimate Type-safe" suffix becomes "Total Type-safe",
   denoting totality in the dependent-type sense (no partial functions, no
   undefined behaviour at type level).
-- **VeriSimDB → Verisim**: the underlying engine's name shortens in discussion.
-  (The GitHub repo stays `verisimdb` to avoid rename damage.)
+- **VeriSimDB → Verisim**: the underlying engine's name shortens in discussion
+  (the GitHub repository stays `verisimdb` to avoid rename damage).
 
 ### Scope of this rename pass
 
 Changed in this commit:
 
-- Crate names: `vqlut-core`, `vqlut-interface`, `vqlut-fmt`, `vqlut-lint`,
-  `vqlut-lsp`, `vqlut-dap` → `vcltotal-core`, `vcltotal-interface`, etc.
-- Rust modules + file names: `vql_ut.rs`, `vql_ut/` directories → `vcl_total.rs`,
-  `vcl_total/`.
-- Idris2 sources: module declarations and file names migrated where they
-  referenced VQL/UT identifiers.
-- Zig FFI files: `vql_ut.zig` → `vcl_total.zig` (already done in the `echidna`
-  repo; this repo had matching files).
-- File extension: `.vqlut` → `.vcltotal`.
-- Test fixture names and identifiers.
-- Documentation prose throughout `docs/`, `QUICKSTART-*.adoc`, `EXPLAINME.adoc`,
-  `ROADMAP.adoc`, `CONTRIBUTING.adoc`, `SECURITY.md`.
-- CI workflow job names and README badges.
-- Contractile/K9 files: `vql-ut-guard.k9.ncl` → `vcl-total-guard.k9.ncl`.
+- Crate names in Cargo.toml manifests (core, interface, fmt, lint, lsp, dap)
+- Rust module and file names (src/**, benches/, tests/)
+- ReScript bridge modules (src/bridges/, src/definitions/, src/errors/)
+- Idris2 sources and module declarations
+- File extension `.vqlut` → `.vcltotal`
+- Documentation prose in `docs/`, `QUICKSTART-*.adoc`, `EXPLAINME.adoc`,
+  `ROADMAP.adoc`, `CONTRIBUTING.adoc`, `SECURITY.md`
+- CI workflow job names and README badges
+- Contractile K9 guard file
+- Container and dev-container configuration
+- Machine-readable manifests (`.machine_readable/`, `0-AI-MANIFEST.a2ml`)
+- Zenodo metadata file (.zenodo.json)
+- LaTeX paper (arcvix-10-level-query-safety.tex)
 
 ### NOT changed (deliberately)
 
-- **GitHub repository name**: still `hyperpolymath/vql-ut`. A repo rename would
-  ripple to clone URLs, mirror paths, CI tokens, and issue/PR continuity via
-  GitHub redirects — tracked as a separate decision.
-- **Zenodo DOI metadata**: the existing deposit (10.5281/zenodo.19329501) is
-  registered under the name *VQL-UT*. A new DOI under *VCL-total* can be
-  minted at the next release, pointing at this commit as the rename point.
-- **External citations**: any published references to "VQL-UT" still resolve
-  correctly through the historical record (git history, Zenodo, preprints).
+- **GitHub repository name**: still `hyperpolymath/vql-ut`. A repository
+  rename would ripple to clone URLs, mirror paths, CI tokens, and issue/PR
+  continuity via GitHub redirects — tracked as a separate decision.
+- **GitLab mirror path** at `gitlab.com/hyperpolymath/vql-ut`.
+- **Zenodo DOI** 10.5281/zenodo.19329501 — registered under the original
+  name. A new DOI under the updated name can be minted at the next release.
+- **External citations** — published references still resolve through the
+  historical record (git history, Zenodo, preprints).
 
-The ecosystem-level VQL → VCL rename landed 2026-04-05 in `verisimdb`,
-`hypatia`, `gitbot-fleet`, and `echidna` repositories. This repo now joins
-that naming scheme.
+The ecosystem-level migration landed 2026-04-05 in `verisimdb`, `hypatia`,
+`gitbot-fleet`, and `echidna` repositories. This repo now joins that naming
+scheme.

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 
-/// VQL-UT Shared Definitions — constants, version info, and vocabulary.
+/// VCL-total Shared Definitions — constants, version info, and vocabulary.
 
 /// ABI version (major, minor, patch)
 let abiVersion = (0, 1, 0)
@@ -12,11 +12,11 @@ let abiVersionPacked = {
   lor(lor(lsl(major, 16), lsl(minor, 8)), patch)
 }
 
-/// File extension for VQL-UT queries
-let fileExtension = ".vqlut"
+/// File extension for VCL-total queries
+let fileExtension = ".vcltotal"
 
-/// MIME type for VQL-UT queries (application/vql-ut)
-let mimeType = "application/vql-ut"
+/// MIME type for VCL-total queries (application/vcl-total)
+let mimeType = "application/vcl-total"
 
 /// The 10 safety level names
 let safetyLevelNames = [
@@ -60,18 +60,18 @@ let queryPathFromLevel = (level: int): queryPath =>
 /// Query path display name
 let queryPathName = (path: queryPath): string =>
   switch path {
-  | Slipstream => "VQL (Slipstream)"
-  | Dt => "VQL-DT"
-  | Ut => "VQL-UT"
+  | Slipstream => "VCL (Slipstream)"
+  | Dt => "VCL-DT"
+  | Ut => "VCL-total"
   }
 
-/// The 8 VeriSimDB modality names (uppercase, matching VQL syntax)
+/// The 8 VeriSimDB modality names (uppercase, matching VCL syntax)
 let modalityNames = [
   "GRAPH", "VECTOR", "TENSOR", "SEMANTIC",
   "DOCUMENT", "TEMPORAL", "PROVENANCE", "SPATIAL",
 ]
 
-/// Reserved keywords in VQL-UT (case-insensitive)
+/// Reserved keywords in VCL-total (case-insensitive)
 let keywords = [
   "SELECT", "FROM", "WHERE", "GROUP", "BY", "HAVING", "ORDER",
   "LIMIT", "OFFSET", "AND", "OR", "NOT", "IN", "LIKE", "AS",

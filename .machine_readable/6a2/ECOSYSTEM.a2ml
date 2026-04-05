@@ -9,8 +9,8 @@ version = "0.1.0"
 last-updated = "2026-03-16"
 
 [project]
-name = "VQL-UT"
-purpose = "VQL Ultimate Type-Safety — 10-level query safety checker for VeriSimDB"
+name = "VCL-total"
+purpose = "VCL Ultimate Type-Safety — 10-level query safety checker for VeriSimDB"
 role = "library"  # e.g. ffi-infrastructure, cli-tool, library, service
 
 [position-in-ecosystem]

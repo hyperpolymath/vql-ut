@@ -42,7 +42,7 @@ let vcl_ut_guard = {
       description = "ReScript bridge parser file is available.",
       severity = "error",
       check_type = "file-exists",
-      file = "src/bridges/VqlUtParser.res",
+      file = "src/bridges/VclTotalParser.res",
     },
 
     no_template_placeholders = {

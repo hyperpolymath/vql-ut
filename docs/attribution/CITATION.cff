@@ -4,7 +4,7 @@ authors:
 - family-names: "Jewell"
   given-names: "Jonathan D.A."
   orcid: "https://orcid.org/0000-0000-0000-0000" # Placeholder
-title: "VQL-UT"
+title: "VCL-total"
 version: 0.1.0
 date-released: 2026-03-16
 url: "https://github.com/hyperpolymath/vql-ut"

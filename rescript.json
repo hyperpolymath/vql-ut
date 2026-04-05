@@ -1,5 +1,5 @@
 {
-  "name": "vql-ut",
+  "name": "vcl-total",
   "sources": [
     { "dir": "src/bridges", "subdirs": false },
     { "dir": "src/errors", "subdirs": false },

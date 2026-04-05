@@ -7,14 +7,14 @@
 ||| C-compatible structs crossing the VCL-total FFI boundary.
 |||
 ||| Covers encoding/decoding roundtrip proofs for SafetyLevel, QueryMode,
-||| VqlUtError, and the QueryPlanHeader struct layout.
+||| VclTotalError, and the QueryPlanHeader struct layout.
 |||
 ||| @see Types.idr for type definitions
 ||| @see Foreign.idr for FFI function declarations
 
-module VqlUt.ABI.Layout
+module VclTotal.ABI.Layout
 
-import VqlUt.ABI.Types
+import VclTotal.ABI.Types
 import Data.Vect
 import Data.So
 
@@ -89,17 +89,17 @@ queryModeRoundtrip DependentTypes   = Refl
 queryModeRoundtrip UltimateTypeSafe = Refl
 
 --------------------------------------------------------------------------------
--- VqlUtError Tag Encoding (0-10)
+-- VclTotalError Tag Encoding (0-10)
 --------------------------------------------------------------------------------
 
-||| Size constant: VqlUtError is encoded as a single Bits32 (4 bytes)
+||| Size constant: VclTotalError is encoded as a single Bits32 (4 bytes)
 public export
 vqlUtErrorSize : Nat
 vqlUtErrorSize = 4
 
-||| Roundtrip proof: encoding then decoding a VqlUtError yields the original
+||| Roundtrip proof: encoding then decoding a VclTotalError yields the original
 public export
-vqlUtErrorRoundtrip : (e : VqlUtError) -> intToVqlUtError (vqlUtErrorToInt e) = Just e
+vqlUtErrorRoundtrip : (e : VclTotalError) -> intToVclTotalError (vqlUtErrorToInt e) = Just e
 vqlUtErrorRoundtrip Ok                     = Refl
 vqlUtErrorRoundtrip ParseError             = Refl
 vqlUtErrorRoundtrip SchemaError            = Refl

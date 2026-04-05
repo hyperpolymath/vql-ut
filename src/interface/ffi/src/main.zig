@@ -48,8 +48,8 @@ pub const QueryMode = enum(u32) {
     ultimate_type_safe = 2,
 };
 
-/// VqlUtError tag values (0-10), matching VqlUtError in Types.idr
-pub const VqlUtError = enum(u32) {
+/// VclTotalError tag values (0-10), matching VclTotalError in Types.idr
+pub const VclTotalError = enum(u32) {
     ok = 0,
     parse_error = 1,
     schema_error = 2,
@@ -191,7 +191,7 @@ export fn vqlut_abi_version() u32 {
 /// @param query      Pointer to null-terminated VCL query string (unused in stub)
 /// @param mode       QueryMode tag (0-2)
 /// @param out_handle Out-pointer: receives handle on success (pointer to u64)
-/// @return VqlUtError tag
+/// @return VclTotalError tag
 export fn vqlut_parse(query: u64, mode: u32, out_handle: u64) u32 {
     _ = query;
     _ = out_handle;
@@ -199,14 +199,14 @@ export fn vqlut_parse(query: u64, mode: u32, out_handle: u64) u32 {
     // Validate mode tag
     const query_mode = std.meta.intToEnum(QueryMode, mode) catch {
         setError("Invalid query mode");
-        return @intFromEnum(VqlUtError.internal_error);
+        return @intFromEnum(VclTotalError.internal_error);
     };
 
     // Allocate a context slot
     const handle = allocSlot();
     if (handle == 0) {
         setError("Context pool exhausted");
-        return @intFromEnum(VqlUtError.internal_error);
+        return @intFromEnum(VclTotalError.internal_error);
     }
 
     // Configure the context
@@ -217,7 +217,7 @@ export fn vqlut_parse(query: u64, mode: u32, out_handle: u64) u32 {
     }
 
     clearError();
-    return @intFromEnum(VqlUtError.ok);
+    return @intFromEnum(VclTotalError.ok);
 }
 
 /// Bind a parse tree to a database schema.
@@ -225,74 +225,74 @@ export fn vqlut_parse(query: u64, mode: u32, out_handle: u64) u32 {
 /// @param parse_tree   Handle from vqlut_parse
 /// @param schema       Handle to a loaded schema (unused in stub)
 /// @param out_handle   Out-pointer (unused in stub)
-/// @return VqlUtError tag
+/// @return VclTotalError tag
 export fn vqlut_bind_schema(parse_tree: u64, schema: u64, out_handle: u64) u32 {
     _ = schema;
     _ = out_handle;
 
     const ctx = getContext(parse_tree) orelse {
         setError("Invalid parse tree handle");
-        return @intFromEnum(VqlUtError.internal_error);
+        return @intFromEnum(VclTotalError.internal_error);
     };
 
     if (ctx.stage != .parsed) {
         setError("Expected parsed stage");
-        return @intFromEnum(VqlUtError.internal_error);
+        return @intFromEnum(VclTotalError.internal_error);
     }
 
     ctx.stage = .schema_bound;
     ctx.achieved_level = .schema_bound;
     clearError();
-    return @intFromEnum(VqlUtError.ok);
+    return @intFromEnum(VclTotalError.ok);
 }
 
 /// Type-check a schema-bound tree.
 ///
 /// @param bound_tree  Handle from vqlut_bind_schema
 /// @param out_handle  Out-pointer (unused in stub)
-/// @return VqlUtError tag
+/// @return VclTotalError tag
 export fn vqlut_check_types(bound_tree: u64, out_handle: u64) u32 {
     _ = out_handle;
 
     const ctx = getContext(bound_tree) orelse {
         setError("Invalid bound tree handle");
-        return @intFromEnum(VqlUtError.internal_error);
+        return @intFromEnum(VclTotalError.internal_error);
     };
 
     if (ctx.stage != .schema_bound) {
         setError("Expected schema_bound stage");
-        return @intFromEnum(VqlUtError.internal_error);
+        return @intFromEnum(VclTotalError.internal_error);
     }
 
     // In Slipstream mode, type checking covers levels 2-4
     ctx.stage = .type_checked;
     ctx.achieved_level = .injection_proof;
     clearError();
-    return @intFromEnum(VqlUtError.ok);
+    return @intFromEnum(VclTotalError.ok);
 }
 
 /// Check effects on a typed tree.
 ///
 /// @param typed_tree  Handle from vqlut_check_types
 /// @param out_handle  Out-pointer (unused in stub)
-/// @return VqlUtError tag
+/// @return VclTotalError tag
 export fn vqlut_check_effects(typed_tree: u64, out_handle: u64) u32 {
     _ = out_handle;
 
     const ctx = getContext(typed_tree) orelse {
         setError("Invalid typed tree handle");
-        return @intFromEnum(VqlUtError.internal_error);
+        return @intFromEnum(VclTotalError.internal_error);
     };
 
     if (ctx.stage != .type_checked) {
         setError("Expected type_checked stage");
-        return @intFromEnum(VqlUtError.internal_error);
+        return @intFromEnum(VclTotalError.internal_error);
     }
 
     ctx.stage = .effect_checked;
     ctx.achieved_level = .effect_tracked;
     clearError();
-    return @intFromEnum(VqlUtError.ok);
+    return @intFromEnum(VclTotalError.ok);
 }
 
 /// Compile an annotated tree into a query plan.
@@ -300,19 +300,19 @@ export fn vqlut_check_effects(typed_tree: u64, out_handle: u64) u32 {
 /// @param annotated_tree  Handle from vqlut_check_effects
 /// @param out_plan        Out-pointer for plan buffer (unused in stub)
 /// @param out_plan_size   Out-pointer for plan buffer size (unused in stub)
-/// @return VqlUtError tag
+/// @return VclTotalError tag
 export fn vqlut_compile(annotated_tree: u64, out_plan: u64, out_plan_size: u64) u32 {
     _ = out_plan;
     _ = out_plan_size;
 
     const ctx = getContext(annotated_tree) orelse {
         setError("Invalid annotated tree handle");
-        return @intFromEnum(VqlUtError.internal_error);
+        return @intFromEnum(VclTotalError.internal_error);
     };
 
     if (ctx.stage != .effect_checked) {
         setError("Expected effect_checked stage");
-        return @intFromEnum(VqlUtError.internal_error);
+        return @intFromEnum(VclTotalError.internal_error);
     }
 
     // Set final safety level based on mode
@@ -324,7 +324,7 @@ export fn vqlut_compile(annotated_tree: u64, out_plan: u64, out_plan_size: u64) 
 
     ctx.stage = .compiled;
     clearError();
-    return @intFromEnum(VqlUtError.ok);
+    return @intFromEnum(VclTotalError.ok);
 }
 
 /// Get the highest achieved safety level for a query plan.
@@ -449,7 +449,7 @@ test "destroy invalid is safe" {
 
 test "invalid mode returns error" {
     const result = vqlut_parse(0, 99, 0);
-    try std.testing.expectEqual(@intFromEnum(VqlUtError.internal_error), result);
+    try std.testing.expectEqual(@intFromEnum(VclTotalError.internal_error), result);
 }
 
 test "pipeline stage enforcement" {
@@ -459,7 +459,7 @@ test "pipeline stage enforcement" {
 
     // Skip bind_schema — go straight to check_types (should fail)
     const result = vqlut_check_types(handle, 0);
-    try std.testing.expectEqual(@intFromEnum(VqlUtError.internal_error), result);
+    try std.testing.expectEqual(@intFromEnum(VclTotalError.internal_error), result);
 
     vqlut_destroy(handle);
 }

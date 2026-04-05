@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 //
-// VQL-UT Abstract Syntax Tree — ReScript representation
+// VCL-total Abstract Syntax Tree — ReScript representation
 //
-// Mirrors VqlUt.Core.Grammar (Idris2) for parser output.
+// Mirrors VclTotal.Core.Grammar (Idris2) for parser output.
 // Every type here corresponds one-to-one with the Idris2 AST defined in
 // src/core/Grammar.idr, enabling round-trip serialisation across the
 // Idris2 → C ABI → Zig FFI → ReScript bridge.
@@ -11,7 +11,7 @@
 // The Idris2 side carries dependent-type proofs (TypeCompatible,
 // WellFormed, SafetyCertificate) that cannot be expressed in ReScript.
 // This module provides the *data* representation only; the ReScript
-// parser (VqlUtParser.res) constructs these nodes and the Zig FFI
+// parser (VclTotalParser.res) constructs these nodes and the Zig FFI
 // layer validates them against the formal specification.
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -19,15 +19,15 @@
 // ═══════════════════════════════════════════════════════════════════════
 
 /// The 8 VeriSimDB modalities an octad can contain.
-/// Maps to VqlUt.Core.Grammar.Modality (Idris2).
+/// Maps to VclTotal.Core.Grammar.Modality (Idris2).
 type modality = Graph | Vector | Tensor | Semantic | Document | Temporal | Provenance | Spatial
 
 // ═══════════════════════════════════════════════════════════════════════
 // Value Types (type system for expressions)
 // ═══════════════════════════════════════════════════════════════════════
 
-/// Types that VQL-UT expressions can evaluate to.
-/// Maps to VqlUt.Core.Grammar.VqlType (Idris2).
+/// Types that VCL-total expressions can evaluate to.
+/// Maps to VclTotal.Core.Grammar.VqlType (Idris2).
 ///
 /// TVector carries a dimension count (e.g. TVector(768) for an embedding).
 /// TRecord carries an array of (field_name, field_type) pairs.
@@ -54,11 +54,11 @@ type rec vqlType =
 
 /// Field reference: MODALITY.field_name
 /// E.g. GRAPH.name, VECTOR.embedding, TEMPORAL.created_at
-/// Maps to VqlUt.Core.Grammar.FieldRef (Idris2 record).
+/// Maps to VclTotal.Core.Grammar.FieldRef (Idris2 record).
 type fieldRef = {modality: modality, fieldName: string}
 
-/// Literal values that can appear in VQL-UT expressions.
-/// Maps to VqlUt.Core.Grammar.Literal (Idris2).
+/// Literal values that can appear in VCL-total expressions.
+/// Maps to VclTotal.Core.Grammar.Literal (Idris2).
 ///
 /// LitVector holds a dense float array (e.g. for similarity search).
 type literal =
@@ -74,16 +74,16 @@ type literal =
 // ═══════════════════════════════════════════════════════════════════════
 
 /// Comparison operators for WHERE clauses.
-/// Maps to VqlUt.Core.Grammar.CompOp (Idris2).
+/// Maps to VclTotal.Core.Grammar.CompOp (Idris2).
 type compOp = Eq | NotEq | Lt | Gt | LtEq | GtEq | Like | In
 
 /// Logical operators for combining predicates.
-/// Maps to VqlUt.Core.Grammar.LogicOp (Idris2).
+/// Maps to VclTotal.Core.Grammar.LogicOp (Idris2).
 /// Not is unary (right operand is None in ELogic).
 type logicOp = And | Or | Not
 
 /// Aggregate functions for SELECT and HAVING clauses.
-/// Maps to VqlUt.Core.Grammar.AggFunc (Idris2).
+/// Maps to VclTotal.Core.Grammar.AggFunc (Idris2).
 type aggFunc = Count | Sum | Avg | Min | Max
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -94,7 +94,7 @@ type aggFunc = Count | Sum | Avg | Min | Max
 /// Every expression carries a vqlType annotation (initially TAny,
 /// resolved during type checking at Level 2+).
 ///
-/// Maps to VqlUt.Core.Grammar.Expr (Idris2), which is mutually
+/// Maps to VclTotal.Core.Grammar.Expr (Idris2), which is mutually
 /// recursive with Statement (via ESubquery).
 ///
 /// - EField: references a modality field (GRAPH.name)
@@ -120,7 +120,7 @@ type rec expr =
 // ═══════════════════════════════════════════════════════════════════════
 
 /// SELECT clause item.
-/// Maps to VqlUt.Core.Grammar.SelectItem (Idris2).
+/// Maps to VclTotal.Core.Grammar.SelectItem (Idris2).
 ///
 /// - SelField: single field reference (GRAPH.name)
 /// - SelModality: entire modality (GRAPH)
@@ -133,7 +133,7 @@ and selectItem =
   | SelStar
 
 /// FROM clause source.
-/// Maps to VqlUt.Core.Grammar.Source (Idris2).
+/// Maps to VclTotal.Core.Grammar.Source (Idris2).
 ///
 /// - SrcOctad: a single octad by UUID (HEXAD <uuid>)
 /// - SrcFederation: a federation pattern (FEDERATION <glob>)
@@ -143,8 +143,8 @@ and source =
   | SrcFederation(string)
   | SrcStore(string)
 
-/// PROOF clause for dependent-type verification (VQL-DT extension).
-/// Maps to VqlUt.Core.Grammar.ProofClause (Idris2).
+/// PROOF clause for dependent-type verification (VCL-DT extension).
+/// Maps to VclTotal.Core.Grammar.ProofClause (Idris2).
 ///
 /// - ProofAttached: sigma-type proof is bundled with the result
 /// - ProofWitness: references a named witness (e.g. a pre-registered proof)
@@ -155,7 +155,7 @@ and proofClause =
   | ProofAssert(expr)
 
 /// Effect declaration for Level 7 (effect tracking).
-/// Maps to VqlUt.Core.Grammar.EffectDecl (Idris2).
+/// Maps to VclTotal.Core.Grammar.EffectDecl (Idris2).
 ///
 /// - EffRead: query only reads data
 /// - EffWrite: query writes data
@@ -164,7 +164,7 @@ and proofClause =
 and effectDecl = EffRead | EffWrite | EffReadWrite | EffConsume
 
 /// Version constraint for Level 8 (temporal safety).
-/// Maps to VqlUt.Core.Grammar.VersionConstraint (Idris2).
+/// Maps to VclTotal.Core.Grammar.VersionConstraint (Idris2).
 ///
 /// VeriSimDB supports time-travel queries; these constrain which
 /// version of the data the query operates on.
@@ -175,7 +175,7 @@ and versionConstraint =
   | VerRange(int, int)
 
 /// Linearity annotation for Level 9.
-/// Maps to VqlUt.Core.Grammar.LinearAnnotation (Idris2).
+/// Maps to VclTotal.Core.Grammar.LinearAnnotation (Idris2).
 ///
 /// - LinUnlimited: no constraint (default)
 /// - LinUseOnce: resource consumed after one read (CONSUME AFTER 1 USE)
@@ -190,7 +190,7 @@ and linearAnnotation =
 // ═══════════════════════════════════════════════════════════════════════
 
 /// The 10 progressive safety levels (0-9).
-/// Maps to VqlUt.ABI.Types.SafetyLevel (Idris2).
+/// Maps to VclTotal.ABI.Types.SafetyLevel (Idris2).
 ///
 /// Each level subsumes all prior levels: a query at level N has passed
 /// all checks from levels 0 through N.
@@ -210,11 +210,11 @@ and safetyLevel =
 // Statement (top-level query)
 // ═══════════════════════════════════════════════════════════════════════
 
-/// A complete VQL-UT query statement.
-/// Maps to VqlUt.Core.Grammar.Statement (Idris2 record).
+/// A complete VCL-total query statement.
+/// Maps to VclTotal.Core.Grammar.Statement (Idris2 record).
 ///
 /// Contains the standard SQL-like clauses (SELECT, FROM, WHERE, etc.)
-/// plus VQL-UT extension clauses for proof, effects, versioning, and
+/// plus VCL-total extension clauses for proof, effects, versioning, and
 /// linearity. The requestedLevel indicates the highest safety level
 /// that the parser inferred from the extension clauses present.
 and statement = {
@@ -234,13 +234,13 @@ and statement = {
   limit: option<int>,
   /// Number of results to skip
   offset: option<int>,
-  /// VQL-UT extension: proof clause (Level 4+)
+  /// VCL-total extension: proof clause (Level 4+)
   proofClause: option<proofClause>,
-  /// VQL-UT extension: effect declaration (Level 7+)
+  /// VCL-total extension: effect declaration (Level 7+)
   effectDecl: option<effectDecl>,
-  /// VQL-UT extension: version constraint (Level 8+)
+  /// VCL-total extension: version constraint (Level 8+)
   versionConst: option<versionConstraint>,
-  /// VQL-UT extension: linearity annotation (Level 9)
+  /// VCL-total extension: linearity annotation (Level 9)
   linearAnnot: option<linearAnnotation>,
   /// Highest safety level inferred from present clauses
   requestedLevel: safetyLevel,
@@ -251,7 +251,7 @@ and statement = {
 // ═══════════════════════════════════════════════════════════════════════
 
 /// Convert a safety level to its integer tag (0-9).
-/// Matches VqlUt.ABI.Types.safetyLevelToInt (Idris2).
+/// Matches VclTotal.ABI.Types.safetyLevelToInt (Idris2).
 let safetyLevelToInt = (level: safetyLevel): int =>
   switch level {
   | ParseSafe => 0
@@ -267,7 +267,7 @@ let safetyLevelToInt = (level: safetyLevel): int =>
   }
 
 /// Convert a modality to its string name.
-/// Matches VqlUt.Core.Grammar.modalityName (Idris2).
+/// Matches VclTotal.Core.Grammar.modalityName (Idris2).
 let modalityName = (m: modality): string =>
   switch m {
   | Graph => "GRAPH"
@@ -281,7 +281,7 @@ let modalityName = (m: modality): string =>
   }
 
 /// Convert a modality to its integer tag (0-7).
-/// Matches VqlUt.Core.Grammar.modalityToInt (Idris2).
+/// Matches VclTotal.Core.Grammar.modalityToInt (Idris2).
 let modalityToInt = (m: modality): int =>
   switch m {
   | Graph => 0
@@ -295,7 +295,7 @@ let modalityToInt = (m: modality): int =>
   }
 
 /// Convert a comparison operator to its integer tag (0-7).
-/// Matches VqlUt.Core.Grammar.compOpToInt (Idris2).
+/// Matches VclTotal.Core.Grammar.compOpToInt (Idris2).
 let compOpToInt = (op: compOp): int =>
   switch op {
   | Eq => 0
@@ -309,7 +309,7 @@ let compOpToInt = (op: compOp): int =>
   }
 
 /// Convert an aggregate function to its integer tag (0-4).
-/// Matches VqlUt.Core.Grammar.aggFuncToInt (Idris2).
+/// Matches VclTotal.Core.Grammar.aggFuncToInt (Idris2).
 let aggFuncToInt = (f: aggFunc): int =>
   switch f {
   | Count => 0
@@ -320,7 +320,7 @@ let aggFuncToInt = (f: aggFunc): int =>
   }
 
 /// Convert an effect declaration to its integer tag (0-3).
-/// Matches VqlUt.Core.Grammar.effectDeclToInt (Idris2).
+/// Matches VclTotal.Core.Grammar.effectDeclToInt (Idris2).
 let effectDeclToInt = (e: effectDecl): int =>
   switch e {
   | EffRead => 0

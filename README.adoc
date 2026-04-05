@@ -10,39 +10,38 @@ image:https://zenodo.org/badge/DOI/10.5281/zenodo.19329501.svg[DOI,link="https:/
 image:https://img.shields.io/badge/believe__me-0-brightgreen[believe_me: 0]
 image:https://img.shields.io/badge/tests-49_pass-brightgreen[tests: 49 pass]
 
-IMPORTANT: This project was renamed on 2026-04-05 from **VQL-UT** (VQL Ultimate
-Type-safe) to **VCL-total** (VeriSim Consonance Language — Total Type-safe).
-See CHANGELOG.md for details. The GitHub repository name is still `vql-ut`.
+IMPORTANT: This project was renamed on 2026-04-05. Its former name used
+the letter sequence "V-Q-L-hyphen-U-T" (read: "vee-queue-ell-you-tee") and
+stood for "Ultimate Type-safe". The canonical name is now **VCL-total**
+(VeriSim Consonance Language — Total Type-safe). See CHANGELOG.md for
+the full rename scope. The GitHub repository URL is unchanged.
 
 == Overview
 
 VCL-total is the next-generation interaction language for
-https://github.com/hyperpolymath/verisimdb[Verisim] (formerly VeriSimDB), designed
-to satisfy **all 10 levels of type safety** — the 6 established IO-covered forms
-and the 4 additional forms identified through our research. The `-total` suffix
-denotes totality in the dependent-type sense: no partial functions, no undefined
-behaviour at type level.
+https://github.com/hyperpolymath/verisimdb[Verisim] (engine formerly known
+in discussion as VeriSimDB), designed to satisfy **all 10 levels of type
+safety** — the 6 established IO-covered forms and the 4 additional forms
+identified through our research. The `-total` suffix denotes totality in
+the dependent-type sense: no partial functions, no undefined behaviour at
+type level.
 
-The goal is production-worthy VCL that is provably correct at every layer, from
-parse to execution. At minimum, this repo serves as a research vehicle for
-exploring the boundaries of type-safe interaction languages for consonance
-engines.
+The goal is production-worthy VCL that is provably correct at every layer,
+from parse to execution. At minimum, this repo serves as a research
+vehicle for exploring the boundaries of type-safe interaction languages
+for consonance engines.
 
-NOTE: Verisim operations are **propositions to a consonance engine**, not queries
-against a passive store. Operations split into propositional (`DECLARE`, `ASSERT`,
-`RETRACT`) and epistemic (`INSPECT`, `VERIFY`). "Query language" is therefore a
-misnomer; "consonance language" names the actual thing.
-
-NOTE: Earlier names for this project were "vql++" (briefly), "VQL-UT" (the
-bulk of its history), and "VQL Ultimate Type-Safe". All references to vql++,
-vqlpp, VQL Plus Plus, VQL-UT, or VQL Ultimate Type-Safe should be read as
-VCL-total. File extension: `.vcltotal`.
+NOTE: Verisim operations are **propositions to a consonance engine**, not
+queries against a passive store. Operations split into propositional
+(`DECLARE`, `ASSERT`, `RETRACT`) and epistemic (`INSPECT`, `VERIFY`).
+"Query language" is therefore a misnomer; "consonance language" names
+the actual thing.
 
 == Lineage
 
-The 10 type safety levels originate in **TypeLL** (the core type theory), flow
-into **PanLL** (panel framework type safety), and are now applied to consonance
-statements as **VCL-total**.
+The 10 type safety levels originate in **TypeLL** (the core type theory),
+flow into **PanLL** (panel framework type safety), and are now applied to
+consonance statements as **VCL-total**.
 
 [source]
 ----
@@ -63,7 +62,7 @@ TypeLL (type theory core — defines the 10 levels)
 
 | **VCL**
 | The consonance language
-| Parser (ReScript) → AST → execution. What users write to propose/inspect/verify.
+| Parser (ReScript) → AST → execution. What users write to propose, inspect, or verify.
 
 | **VCL-total**
 | The safety pipeline
@@ -72,15 +71,14 @@ TypeLL (type theory core — defines the 10 levels)
   through L9-L10. Invisible to the user except when they add a `PROOF` clause.
 |===
 
-NOTE: VQL-DT (Dependent Types) was the original name for the proof-carrying
-execution mode (statements with `PROOF` clauses). It is not a separate product —
-it is folded into VCL-total's L9 (Proof Attachment) and L10 (Cross-Cutting)
-levels. All references to "VQL-DT" in older documentation should be read as
-"VCL-total L9-L10".
+NOTE: The dependent-types variant was originally labelled with the suffix
+"-DT" (Dependent Types) as the proof-carrying execution mode (statements
+with `PROOF` clauses). It is not a separate product — it is folded into
+VCL-total's L9 (Proof Attachment) and L10 (Cross-Cutting) levels.
 
-The 6 proof types (EXISTENCE, INTEGRITY, CONSISTENCY, PROVENANCE, FRESHNESS,
-AUTHORIZATION) remain — they are activated by VCL's `PROOF` clause and validated
-by VCL-total levels L9-L10.
+The 6 proof types (EXISTENCE, INTEGRITY, CONSISTENCY, PROVENANCE,
+FRESHNESS, AUTHORIZATION) remain — they are activated by VCL's `PROOF`
+clause and validated by VCL-total levels L9-L10.
 
 === Adoption Strategy
 
@@ -108,7 +106,9 @@ The type safety story unfolds in three phases:
 
 === TypeQL-Experimental Extension Mechanisms (Levels 7-10)
 
-The https://github.com/hyperpolymath/nextgen-databases[typeql-experimental] sub-project within nextgen-databases prototyped 6 mechanisms that map to levels 7-10:
+The https://github.com/hyperpolymath/nextgen-databases[typeql-experimental]
+sub-project within nextgen-databases prototyped 6 mechanisms that map to
+levels 7-10:
 
 [cols="1,2,2"]
 |===

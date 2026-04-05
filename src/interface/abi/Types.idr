@@ -12,7 +12,7 @@
 ||| @see Layout.idr for C-ABI memory layout proofs
 ||| @see Foreign.idr for FFI function declarations
 
-module VqlUt.ABI.Types
+module VclTotal.ABI.Types
 
 import Data.Bits
 import Data.So
@@ -119,33 +119,33 @@ DecEq SafetyLevel where
 ||| Error codes returned by VCL-total FFI operations.
 ||| Each maps to a specific failure mode in the safety checking pipeline.
 public export
-data VqlUtError : Type where
+data VclTotalError : Type where
   ||| Operation succeeded — no error
-  Ok                   : VqlUtError
+  Ok                   : VclTotalError
   ||| Query failed to parse (level 0 failure)
-  ParseError           : VqlUtError
+  ParseError           : VclTotalError
   ||| Schema reference not found (level 1 failure)
-  SchemaError          : VqlUtError
+  SchemaError          : VclTotalError
   ||| Type incompatibility detected (level 2 failure)
-  TypeError            : VqlUtError
+  TypeError            : VclTotalError
   ||| Unhandled NULL propagation (level 3 failure)
-  NullError            : VqlUtError
+  NullError            : VclTotalError
   ||| Potential injection vector detected (level 4 failure)
-  InjectionAttempt     : VqlUtError
+  InjectionAttempt     : VclTotalError
   ||| JOIN cardinality violation (level 6 failure)
-  CardinalityViolation : VqlUtError
+  CardinalityViolation : VclTotalError
   ||| Untracked side effect (level 7 failure)
-  EffectViolation      : VqlUtError
+  EffectViolation      : VclTotalError
   ||| Temporal bounds exceeded (level 8 failure)
-  TemporalBoundsExceeded : VqlUtError
+  TemporalBoundsExceeded : VclTotalError
   ||| Linear resource double-consumed (level 9 failure)
-  LinearityViolation   : VqlUtError
+  LinearityViolation   : VclTotalError
   ||| Internal error (bug in VCL-total itself)
-  InternalError        : VqlUtError
+  InternalError        : VclTotalError
 
-||| Convert VqlUtError to C-compatible integer tag (0-10)
+||| Convert VclTotalError to C-compatible integer tag (0-10)
 public export
-vqlUtErrorToInt : VqlUtError -> Bits32
+vqlUtErrorToInt : VclTotalError -> Bits32
 vqlUtErrorToInt Ok                     = 0
 vqlUtErrorToInt ParseError             = 1
 vqlUtErrorToInt SchemaError            = 2
@@ -158,25 +158,25 @@ vqlUtErrorToInt TemporalBoundsExceeded = 8
 vqlUtErrorToInt LinearityViolation     = 9
 vqlUtErrorToInt InternalError          = 10
 
-||| Parse a C integer tag back to VqlUtError
+||| Parse a C integer tag back to VclTotalError
 public export
-intToVqlUtError : Bits32 -> Maybe VqlUtError
-intToVqlUtError 0  = Just Ok
-intToVqlUtError 1  = Just ParseError
-intToVqlUtError 2  = Just SchemaError
-intToVqlUtError 3  = Just TypeError
-intToVqlUtError 4  = Just NullError
-intToVqlUtError 5  = Just InjectionAttempt
-intToVqlUtError 6  = Just CardinalityViolation
-intToVqlUtError 7  = Just EffectViolation
-intToVqlUtError 8  = Just TemporalBoundsExceeded
-intToVqlUtError 9  = Just LinearityViolation
-intToVqlUtError 10 = Just InternalError
-intToVqlUtError _  = Nothing
+intToVclTotalError : Bits32 -> Maybe VclTotalError
+intToVclTotalError 0  = Just Ok
+intToVclTotalError 1  = Just ParseError
+intToVclTotalError 2  = Just SchemaError
+intToVclTotalError 3  = Just TypeError
+intToVclTotalError 4  = Just NullError
+intToVclTotalError 5  = Just InjectionAttempt
+intToVclTotalError 6  = Just CardinalityViolation
+intToVclTotalError 7  = Just EffectViolation
+intToVclTotalError 8  = Just TemporalBoundsExceeded
+intToVclTotalError 9  = Just LinearityViolation
+intToVclTotalError 10 = Just InternalError
+intToVclTotalError _  = Nothing
 
-||| VqlUtError decidable equality
+||| VclTotalError decidable equality
 public export
-DecEq VqlUtError where
+DecEq VclTotalError where
   decEq Ok                     Ok                     = Yes Refl
   decEq ParseError             ParseError             = Yes Refl
   decEq SchemaError            SchemaError            = Yes Refl
@@ -378,7 +378,7 @@ namespace Verify
 
   ||| Verify that all error tags are in range [0, 10]
   export
-  errorTagsInRange : (e : VqlUtError) -> So (vqlUtErrorToInt e <= 10)
+  errorTagsInRange : (e : VclTotalError) -> So (vqlUtErrorToInt e <= 10)
   errorTagsInRange Ok                     = Oh
   errorTagsInRange ParseError             = Oh
   errorTagsInRange SchemaError            = Oh

@@ -7,15 +7,15 @@
 
 ## WHAT IS THIS?
 
-This is the AI manifest for **vql-ut** (VQL Ultimate Type-Safe) — the 10-level
-type-safe query language for VeriSimDB. It supersedes VQL-DT (dependent types
+This is the AI manifest for **vcl-total** (VCL Ultimate Type-Safe) — the 10-level
+type-safe query language for VeriSimDB. It supersedes VCL-DT (dependent types
 only) as THE formally verified query path.
 
 ## NAMING
 
-- ALWAYS: "VQL-UT", "vql-ut"
-- NEVER: "vql++", "vqlpp", "VQL Plus Plus" (old names, killed 2026-03-16)
-- File extension: `.vqlut` (NOT `.vqlpp`)
+- ALWAYS: "VCL-total", "vcl-total"
+- NEVER: "vcl++", "vqlpp", "VCL Plus Plus" (old names, killed 2026-03-16)
+- File extension: `.vcltotal` (NOT `.vqlpp`)
 
 ## LINEAGE (CRITICAL CONTEXT)
 
@@ -24,33 +24,33 @@ TypeLL (type theory core)
    │
    ├──→ PanLL (panel framework type safety)
    │
-   └──→ VQL-UT (database query language type safety)
+   └──→ VCL-total (database query language type safety)
              │
              └──→ VeriSimDB (6-modal execution engine)
 ```
 
 - **TypeLL** defines the 10 type safety levels as core type theory
 - **PanLL** integrates TypeLL's type safety via TypeLL-PanLL assimilation
-- **VQL-UT** applies those same 10 levels to VeriSimDB's query language
+- **VCL-total** applies those same 10 levels to VeriSimDB's query language
 - The 6 TypeQL-Experimental extensions (linear, session, effect, modal,
-  proof-carrying, QTT) map to VQL-UT levels 7-10
+  proof-carrying, QTT) map to VCL-total levels 7-10
 
 ### The 3 Query Paths in VeriSimDB
 
 | Path | Purpose | Type Safety |
 |------|---------|-------------|
-| VQL (Slipstream) | Standard routine queries, fast | None (runtime only) |
-| VQL-DT | PROOF clauses (6 proof types) | Dependent types via Lean |
-| VQL-UT | All 10 levels, research → production | Full formal verification via Idris2 |
+| VCL (Slipstream) | Standard routine queries, fast | None (runtime only) |
+| VCL-DT | PROOF clauses (6 proof types) | Dependent types via Lean |
+| VCL-total | All 10 levels, research → production | Full formal verification via Idris2 |
 
-If VQL-UT succeeds, it replaces VQL-DT entirely.
+If VCL-total succeeds, it replaces VCL-DT entirely.
 
 ### Adoption Path
 
 1. **ReScript evangeliser** proves the type-safety concept first (in ReScript)
-2. Once proven, **VQL-UT** and **AffineScript** are the two showcase languages
+2. Once proven, **VCL-total** and **AffineScript** are the two showcase languages
    for teaching people the 10 levels of type safety
-3. VQL-UT for database queries, AffineScript for general programming
+3. VCL-total for database queries, AffineScript for general programming
 
 ## CANONICAL LOCATIONS (UNIVERSAL RULE)
 
@@ -67,7 +67,7 @@ These a2ml files MUST exist in `.machine_readable/` directory ONLY:
 
 - `src/interface/abi/` — Idris2 ABI (type kernel, formal proofs)
 - `src/interface/ffi/` — Zig FFI (C-ABI query plan compilation)
-- `src/contracts/` — VQL proof contracts
+- `src/contracts/` — VCL proof contracts
 - `src/parser/` — ReScript parser (surface syntax)
 - `adapter/` — V-lang API layer
 
@@ -112,7 +112,7 @@ These a2ml files MUST exist in `.machine_readable/` directory ONLY:
 
 ### TypeQL-Experimental Extension Mechanisms (for Levels 7-10)
 
-| Mechanism | VQL-UT Syntax | Idris2 Encoding |
+| Mechanism | VCL-total Syntax | Idris2 Encoding |
 |-----------|---------------|-----------------|
 | Linear types | `CONSUME AFTER N USE` | QTT quantity `1` on `Connection` |
 | Session types | `WITH SESSION protocol` | `Session : SessionState -> Type` |
@@ -126,8 +126,8 @@ These a2ml files MUST exist in `.machine_readable/` directory ONLY:
 | Project | Relationship |
 |---------|-------------|
 | nextgen-databases/verisimdb | Target database engine (6-modal) |
-| nextgen-databases/verisimdb/docs/VQL-SPEC.adoc | Base VQL grammar (26KB) |
-| nextgen-databases/verisimdb/docs/vql-vs-vql-dt.adoc | VQL-DT spec (superseded by VQL-UT) |
+| nextgen-databases/verisimdb/docs/VCL-SPEC.adoc | Base VCL grammar (26KB) |
+| nextgen-databases/verisimdb/docs/vcl-vs-vcl-dt.adoc | VCL-DT spec (superseded by VCL-total) |
 | nextgen-databases/typeql-experimental | 6 extension mechanisms for levels 7-10 |
 | typell | Core type theory (10 levels originate here) |
 | panll | Panel framework (integrates TypeLL type safety) |
@@ -135,7 +135,7 @@ These a2ml files MUST exist in `.machine_readable/` directory ONLY:
 
 ## VERISIMDB INSTANCE POLICY (CRITICAL)
 
-VQL-UT connects to **whichever VeriSimDB instance the user's project runs**.
+VCL-total connects to **whichever VeriSimDB instance the user's project runs**.
 Every project has its own VeriSimDB on a unique port. The LSP's `verisimdb_url`
 defaults to empty and MUST be configured per-workspace.
 
@@ -146,7 +146,7 @@ defaults to empty and MUST be configured per-workspace.
 ## SESSION STARTUP CHECKLIST
 
 ✅ Read THIS file (0-AI-MANIFEST.a2ml) first
-✅ Understand: VQL-UT supersedes VQL-DT
-✅ Understand: 10 levels from TypeLL → PanLL → VQL-UT
-✅ NEVER use vql++/vqlpp naming
+✅ Understand: VCL-total supersedes VCL-DT
+✅ Understand: 10 levels from TypeLL → PanLL → VCL-total
+✅ NEVER use vcl++/vqlpp naming
 ✅ Canonical location: `.machine_readable/`
