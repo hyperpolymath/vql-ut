@@ -9,3 +9,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- Run: just changelog -->
 
 ## [Unreleased]
+
+### Renamed (in progress)
+
+**VQL-UT → VCL-total** (2026-04-05). The project name is changing as part of
+the ecosystem-wide VQL → VCL migration:
+
+- **VQL → VCL**: *VeriSim Query Language* → *VeriSim Consonance Language*.
+  Verisim operations are propositions to a consonance engine, not queries
+  against a passive store.
+- **-UT → -total**: the `-ut` ("Ultimate Type-safe") suffix becomes `-total`,
+  denoting totality in the dependent-type sense (no partiality, no undefined
+  behaviour at type level).
+- **VeriSimDB → Verisim**: the underlying engine's name shortens in discussion
+  (the repo stays `verisimdb` to avoid rename damage).
+
+This CHANGELOG entry + the README.adoc rewrite are the **only changes landed
+so far**. The rename has broader implications still to be carried out:
+
+- Crate names (`vql-ut-*` → `vcl-total-*`) in Cargo.toml and dependent repos
+- Rust module/file names (`vql_ut.rs`, `vql_ut/`)
+- Idris2 source files + module names
+- Zig FFI file names (`vql_ut.zig` already renamed in the `echidna` repo)
+- File extension `.vqlut` → `.vcltotal`
+- Test names and fixtures
+- Documentation prose throughout `docs/`, `QUICKSTART-*.adoc`, `EXPLAINME.adoc`
+- CI workflow names and badges
+- External references: Zenodo DOI metadata, citations in papers
+- **Repository rename**: the GitHub repo itself is currently `vql-ut`;
+  rename to `vcl-total` is a separate decision with its own ripple effects
+  (clone URLs, mirror paths, CI tokens, issue/PR continuity via GitHub
+  redirects).
+
+Each of these will be tracked in subsequent CHANGELOG entries as they land.

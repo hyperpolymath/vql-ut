@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-= VQL-UT (VQL Ultimate Type-Safe)
+= VCL-total (VeriSim Consonance Language — Total Type-Safe)
 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 :spdx: PMPL-1.0-or-later
 :status: Pre-Alpha
@@ -10,17 +10,40 @@ image:https://zenodo.org/badge/DOI/10.5281/zenodo.19329501.svg[DOI,link="https:/
 image:https://img.shields.io/badge/believe__me-0-brightgreen[believe_me: 0]
 image:https://img.shields.io/badge/tests-49_pass-brightgreen[tests: 49 pass]
 
+IMPORTANT: This project was renamed on 2026-04-05 from *VQL-UT* to *VCL-total*.
+The rename is currently README + CHANGELOG only — the rest of the repo (sources,
+tests, crate names, file extensions, CI) still uses the `vql-ut` identifiers
+and will be migrated in subsequent passes. See CHANGELOG.md for details.
+
 == Overview
 
-VQL-UT is the next-generation query language for https://github.com/hyperpolymath/nextgen-databases[VeriSimDB], designed to satisfy **all 10 levels of type safety** — the 6 established IO-covered forms and the 4 additional forms identified through our research.
+VCL-total is the next-generation interaction language for
+https://github.com/hyperpolymath/verisimdb[Verisim] (formerly VeriSimDB), designed
+to satisfy **all 10 levels of type safety** — the 6 established IO-covered forms
+and the 4 additional forms identified through our research. The `-total` suffix
+denotes totality in the dependent-type sense: no partial functions, no undefined
+behaviour at type level.
 
-The goal is production-worthy VQL that is provably correct at every layer, from parse to execution. At minimum, this repo serves as a research vehicle for exploring the boundaries of type-safe query languages.
+The goal is production-worthy VCL that is provably correct at every layer, from
+parse to execution. At minimum, this repo serves as a research vehicle for
+exploring the boundaries of type-safe interaction languages for consonance
+engines.
 
-NOTE: This project was briefly known as "vql++" during early discussion. The canonical name is *VQL-UT* (Ultimate Type-Safe). All references to vql++, vqlpp, or VQL Plus Plus should be read as VQL-UT. File extension: `.vqlut`.
+NOTE: Verisim operations are **propositions to a consonance engine**, not queries
+against a passive store. Operations split into propositional (`DECLARE`, `ASSERT`,
+`RETRACT`) and epistemic (`INSPECT`, `VERIFY`). "Query language" is therefore a
+misnomer; "consonance language" names the actual thing.
+
+NOTE: The earlier names for this project were "vql++" (briefly) and "VQL-UT"
+(the bulk of its history). All references to vql++, vqlpp, VQL Plus Plus, or
+VQL-UT should be read as VCL-total. File extension (future): `.vcltotal`
+(currently `.vqlut`).
 
 == Lineage
 
-The 10 type safety levels originate in **TypeLL** (the core type theory), flow into **PanLL** (panel framework type safety), and are now applied to database queries as **VQL-UT**.
+The 10 type safety levels originate in **TypeLL** (the core type theory), flow
+into **PanLL** (panel framework type safety), and are now applied to consonance
+statements as **VCL-total**.
 
 [source]
 ----
@@ -28,9 +51,9 @@ TypeLL (type theory core — defines the 10 levels)
    │
    ├──→ PanLL (panel framework type safety)
    │
-   └──→ VQL-UT (database query language type safety)
+   └──→ VCL-total (consonance-statement type safety)
              │
-             └──→ VeriSimDB (6-modal execution engine)
+             └──→ Verisim (8-modal octad consonance engine)
 ----
 
 === The Two-Tier Model
@@ -39,25 +62,26 @@ TypeLL (type theory core — defines the 10 levels)
 |===
 | Tier | What | How
 
-| **VQL**
-| The query language
-| Parser (ReScript) → AST → execution. What users write.
+| **VCL**
+| The consonance language
+| Parser (ReScript) → AST → execution. What users write to propose/inspect/verify.
 
-| **VQL-UT**
+| **VCL-total**
 | The safety pipeline
-| 10 progressive levels. Sits behind VQL, applies automatically. Simple queries
-  short-circuit at L1-L2. Proof-carrying queries (with `PROOF` clause) go through
-  L9-L10. Invisible to the user except when they add a `PROOF` clause.
+| 10 progressive levels. Sits behind VCL, applies automatically. Simple statements
+  short-circuit at L1-L2. Proof-carrying statements (with `PROOF` clause) go
+  through L9-L10. Invisible to the user except when they add a `PROOF` clause.
 |===
 
-NOTE: VQL-DT (Dependent Types) was the original name for the proof-carrying execution
-mode (queries with `PROOF` clauses). It is not a separate product — it is now folded
-into VQL-UT's L9 (Proof Attachment) and L10 (Cross-Cutting) levels. All references to
-"VQL-DT" in older documentation should be read as "VQL-UT L9-L10".
+NOTE: VCL-DT (Dependent Types) was the original name for the proof-carrying
+execution mode (statements with `PROOF` clauses). It is not a separate product —
+it is folded into VCL-total's L9 (Proof Attachment) and L10 (Cross-Cutting)
+levels. All references to "VCL-DT" or "VQL-DT" in older documentation should be
+read as "VCL-total L9-L10".
 
 The 6 proof types (EXISTENCE, INTEGRITY, CONSISTENCY, PROVENANCE, FRESHNESS,
-AUTHORIZATION) remain — they are activated by VQL's `PROOF` clause and validated
-by VQL-UT levels L9-L10.
+AUTHORIZATION) remain — they are activated by VCL's `PROOF` clause and validated
+by VCL-total levels L9-L10.
 
 === Adoption Strategy
 
