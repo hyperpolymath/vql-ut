@@ -533,6 +533,116 @@ fn level_10_linearity_single_use() {
 }
 
 // ============================================================================
+// Point-to-point: Formatter — VCL-total extension keywords
+// ============================================================================
+
+#[test]
+fn fmt_indents_offset() {
+    let output = format_vqlut("OFFSET 10");
+    assert!(output.starts_with("  OFFSET"), "OFFSET should be indented");
+}
+
+#[test]
+fn fmt_indents_effects() {
+    let output = format_vqlut("EFFECTS { Read }");
+    assert!(output.starts_with("  EFFECTS"), "EFFECTS should be indented");
+}
+
+#[test]
+fn fmt_indents_proof() {
+    let output = format_vqlut("PROOF ATTACHED");
+    assert!(output.starts_with("  PROOF"), "PROOF should be indented");
+}
+
+#[test]
+fn fmt_indents_consume() {
+    let output = format_vqlut("CONSUME AFTER 1 USE");
+    assert!(output.starts_with("  CONSUME"), "CONSUME should be indented");
+}
+
+#[test]
+fn fmt_does_not_indent_offset_prefix() {
+    // "OFFSETTING" starts with OFFSET but is not the keyword
+    let output = format_vqlut("OFFSETTING values");
+    assert!(!output.starts_with("  "), "OFFSETTING should not be indented");
+}
+
+// ============================================================================
+// Point-to-point: Linter — VCL-total semantic checks
+// ============================================================================
+
+#[test]
+fn lint_detects_select_star() {
+    let input = "SELECT * FROM users;";
+    let issues = lint_vqlut(input);
+    let star_issues: Vec<&LintIssue> = issues
+        .iter()
+        .filter(|i| i.message.contains("SELECT *"))
+        .collect();
+    assert!(
+        !star_issues.is_empty(),
+        "Should warn about SELECT * for result-type safety"
+    );
+}
+
+#[test]
+fn lint_no_select_star_warning_for_explicit_columns() {
+    let input = "SELECT id, name FROM users;";
+    let issues = lint_vqlut(input);
+    let star_issues: Vec<&LintIssue> = issues
+        .iter()
+        .filter(|i| i.message.contains("SELECT *"))
+        .collect();
+    assert!(
+        star_issues.is_empty(),
+        "Should not warn when explicit columns are listed"
+    );
+}
+
+#[test]
+fn lint_detects_offset_without_limit() {
+    let input = "SELECT id FROM users\nOFFSET 10;";
+    let issues = lint_vqlut(input);
+    let offset_issues: Vec<&LintIssue> = issues
+        .iter()
+        .filter(|i| i.message.contains("OFFSET without LIMIT"))
+        .collect();
+    assert!(
+        !offset_issues.is_empty(),
+        "Should warn about OFFSET without LIMIT"
+    );
+}
+
+#[test]
+fn lint_no_offset_warning_when_limit_present() {
+    let input = "SELECT id FROM users\nLIMIT 10\nOFFSET 5;";
+    let issues = lint_vqlut(input);
+    let offset_issues: Vec<&LintIssue> = issues
+        .iter()
+        .filter(|i| i.message.contains("OFFSET without LIMIT"))
+        .collect();
+    assert!(
+        offset_issues.is_empty(),
+        "Should not warn about OFFSET when LIMIT is present"
+    );
+}
+
+#[test]
+fn lint_detects_lowercase_vcl_extension_keywords() {
+    let input = "x effects y consume z;";
+    let issues = lint_vqlut(input);
+    let kw_issues: Vec<&LintIssue> = issues
+        .iter()
+        .filter(|i| i.message.contains("should be uppercase"))
+        .collect();
+    assert!(
+        kw_issues.len() >= 2,
+        "Should detect lowercase 'effects' and 'consume'. Got: {}",
+        kw_issues.len()
+    );
+}
+
+// ============================================================================
 // Stress and regression tests
 // ============================================================================
 
