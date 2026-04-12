@@ -126,6 +126,25 @@ data L10_EpistemicSafe : Statement -> Type where
 -- Helper Predicates
 -- ═══════════════════════════════════════════════════════════════════════
 
+||| Extract field references from a SELECT item list.
+||| Exported so that Composition.idr can prove distributivity over (++).
+public export
+selectFieldRefs : List SelectItem -> List FieldRef
+selectFieldRefs [] = []
+selectFieldRefs (SelField ref :: rest) = ref :: selectFieldRefs rest
+selectFieldRefs (_ :: rest) = selectFieldRefs rest
+
+||| Extract field references from an optional expression.
+||| Exported so that Composition.idr can prove properties of joinWhere.
+public export
+exprFieldRefs : Maybe Expr -> List FieldRef
+exprFieldRefs Nothing = []
+exprFieldRefs (Just (EField ref _)) = [ref]
+exprFieldRefs (Just (ECompare _ l r _)) = exprFieldRefs (Just l) ++ exprFieldRefs (Just r)
+exprFieldRefs (Just (ELogic _ l mr _)) = exprFieldRefs (Just l) ++ exprFieldRefs mr
+exprFieldRefs (Just (EAggregate _ e _)) = exprFieldRefs (Just e)
+exprFieldRefs _ = []
+
 ||| Extract all field references from a statement.
 public export
 extractFieldRefs : Statement -> List FieldRef
@@ -135,19 +154,6 @@ extractFieldRefs stmt =
   (groupBy stmt) ++
   exprFieldRefs (having stmt) ++
   map fst (orderBy stmt)
-  where
-    selectFieldRefs : List SelectItem -> List FieldRef
-    selectFieldRefs [] = []
-    selectFieldRefs (SelField ref :: rest) = ref :: selectFieldRefs rest
-    selectFieldRefs (_ :: rest) = selectFieldRefs rest
-
-    exprFieldRefs : Maybe Expr -> List FieldRef
-    exprFieldRefs Nothing = []
-    exprFieldRefs (Just (EField ref _)) = [ref]
-    exprFieldRefs (Just (ECompare _ l r _)) = exprFieldRefs (Just l) ++ exprFieldRefs (Just r)
-    exprFieldRefs (Just (ELogic _ l mr _)) = exprFieldRefs (Just l) ++ exprFieldRefs mr
-    exprFieldRefs (Just (EAggregate _ e _)) = exprFieldRefs (Just e)
-    exprFieldRefs _ = []
 
 ||| Proof that all comparisons in an expression use compatible types.
 public export

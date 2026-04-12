@@ -1,0 +1,156 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= VQL-UT: Supplementary Proof for Theorem [Composition Preservation]
+:toc: left
+:sectnums:
+
+This document is the supplementary material for §8 of the VQL-UT paper.
+It describes and locates the mechanised Idris 2 proof of Theorem
+[Composition Preservation].
+
+== Source Location
+
+All proofs reside in the repository at:
+
+[source]
+----
+src/core/Composition.idr     -- The theorem and all helper lemmas
+src/core/Levels.idr          -- SafetyCertificate type and level predicates
+src/core/Grammar.idr         -- Statement, selectFieldRefs, exprFieldRefs
+src/core/Schema.idr          -- OctadSchema, FieldBound, AllFieldsBound
+----
+
+All files use `%default total`.  No `believe_me`, `assert_total`,
+`postulate`, or `sorry` appears anywhere.
+
+== Proof Structure
+
+=== Composition Operation
+
+`composeJoin : Statement -> Statement -> Statement` (Composition.idr)
+
+Defines the relational join of two queries.  Key design choices:
+
+- SELECT items: concatenated (`selectItems q1 ++ selectItems q2`)
+- WHERE clause: AND-conjoined via `joinWhere` (`ELogic And w1 w2`)
+- GROUP BY: concatenated
+- HAVING: dropped (not preserved through join)
+- LIMIT: `min n1 n2` (stricter bound)
+- EFFECTS: union
+- VERSION: tightened to most recent
+- LINEAR: stricter annotation
+- EPISTEMIC: merged agent sets and requirement lists
+
+=== Composable Predicate
+
+`data Composable : Statement -> Statement -> Type` — two queries are
+composable iff they target the same source octad
+(`source q1 = source q2`).
+
+=== Helper Lemmas
+
+[cols="1,3"]
+|===
+|Lemma |Purpose
+
+|`appendNilRight`          |xs ++ [] = xs (list identity)
+|`mapFstAppend`            |map fst distributes over ++
+|`selectFieldRefsAppend`   |selectFieldRefs distributes over ++
+|`joinWhereBoth`           |exprFieldRefs of AND-join = union of both sides (by Refl)
+|`joinWhereNilR/LNil`      |exprFieldRefs of half-Nothing join inherits the other side
+|`allFieldsBoundAppend`    |AllFieldsBound closed under list append
+|`allFieldsBoundSubset`    |AllFieldsBound respects membership subset
+|`allFieldsBoundFromElem`  |Build AllFieldsBound from an element-wise lookup
+|`boundLookup`             |Look up a FieldBound by Elem evidence
+|`elemAppendLeft/Right`    |Elem in xs → Elem in xs ++ ys (and symmetric)
+|`elemAppendSplit`         |Elem in xs ++ ys → Elem in xs or Elem in ys
+|`composeJoinFieldsSubset` |Every field ref in composeJoin q1 q2 is in refs(q1) ∪ refs(q2)
+|===
+
+=== Level-by-Level Proof Summary
+
+[cols="1,2,3"]
+|===
+|Level |Certificate constructor |Why it's preserved
+
+|L0 ParseSafe
+|`CertL0`
+|`MkL0 (composeJoin _ _)` — the join is parseable by construction.
+
+|L1 SchemaBound
+|`CertL1`
+|`composeJoinFieldsSubset` + `allFieldsBoundSubset` + `allFieldsBoundAppend`.
+ Every field ref in the join comes from q1 or q2; both are schema-bound.
+
+|L2 TypeCompat
+|`CertL2`
+|The joined WHERE is `ELogic And w1 w2 TBool`.
+ `LogicSafe : ExprTypeSafe (ELogic ...) schema` holds unconditionally.
+
+|L3 NullSafe
+|`CertL3`
+|`GuardedNull : AllNullableFieldsGuarded (Just expr) schema` holds
+ for any expression — the predicate asserts existence of null guards
+ without inspecting the expression structure.
+
+|L4 InjectionProof
+|`CertL4`
+|`AllParameterised : NoRawUserInput stmt` holds for any statement.
+ `composeJoin` does not introduce raw user input (it only combines
+ existing AST nodes, all of which were already parameterised).
+
+|L5 ResultTyped
+|`CertL5`
+|`ConsTyped/NilTyped` inductively covers any select list.
+ The combined list `selectItems q1 ++ selectItems q2` is typed
+ item-by-item using `selectTypedAppend`.
+
+|L6 CardinalitySafe
+|`CertL6`
+|`l6Compose`: `joinLimit (Just n1) (Just n2) = Just (min n1 n2)`,
+ so the composed LIMIT is `Just` when both are.
+
+|L7 EffectTracked
+|`CertL7`
+|`l7Compose`: effect declarations are unioned; the union is `Just`
+ when both operands are `Just`.
+
+|L8 TemporalSafe
+|`CertL8`
+|`l8Compose`: version constraints are tightened to the most recent;
+ the result is `Just` when both are `Just`.
+
+|L9 LinearSafe
+|`CertL9`
+|`l9Compose`: the stricter linear annotation wins;
+ the result is `Just` when both are `Just`.
+
+|L10 EpistemicSafe
+|`CertL10`
+|`l10Compose`: agent sets and requirement lists are merged.
+ The result is `Just (EpClause (as1 ++ as2) (rs1 ++ rs2))`.
+|===
+
+=== The Main Theorem
+
+[source,idris]
+----
+compositionPreservation :
+  (q1, q2 : Statement) ->
+  (schema : OctadSchema) ->
+  (k : SafetyLevel) ->
+  Composable q1 q2 ->
+  SafetyCertificate q1 schema k ->
+  SafetyCertificate q2 schema k ->
+  SafetyCertificate (composeJoin q1 q2) schema k
+----
+
+Proof by case analysis on `k` (the safety level).  Each case constructs
+the composed certificate from the two input certificates using the helpers
+above.  The totality checker accepts all 11 cases.
+
+== Scope
+
+This proof covers the `composeJoin` operation (inner equi-join).
+Union, intersection, and subquery composition are conjectured to follow
+the same pattern but are not yet mechanised; this is future work.

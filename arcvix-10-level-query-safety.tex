@@ -1143,17 +1143,36 @@ where $\bowtie$ is any standard relational composition (join, union,
 intersection, subquery).
 \end{theorem}
 
-\begin{proof}[Proof sketch]
-By structural induction on the composition.  Each safety level's
-predicate is closed under the standard relational algebra operations,
-given that the type system propagates the relevant invariants.
-Null safety propagates through joins (left join lifts right-hand
-columns to nullable).  Cardinality composes via the product rule
-($\mathsf{ExactlyOne} \bowtie \mathsf{ExactlyOne} = \mathsf{ExactlyOne}$
-for key-foreign-key joins).  Effects compose via union.
-Temporal bounds compose via intersection of time ranges.
-Provenance attestations compose via Merkle tree concatenation.
-Full proofs are provided in the supplementary material.
+\begin{proof}
+By case analysis on the safety level $k$.  Each case constructs a
+certificate for $q_1 \bowtie q_2$ from the certificates for $q_1$ and $q_2$.
+
+\textbf{L0 (parse safety):} $q_1 \bowtie q_2$ is syntactically valid by
+construction of \texttt{composeJoin}.
+
+\textbf{L1 (schema binding):} Every field reference in $q_1 \bowtie q_2$
+appears in the field references of $q_1$ or $q_2$ (\texttt{composeJoinFieldsSubset}),
+both of which are schema-bound; closure under list append
+(\texttt{allFieldsBoundSubset}) finishes the case.
+
+\textbf{L2--L5 (type compat, null, injection, result typing):}
+The predicates at these levels use unconditional constructors
+(\texttt{LogicSafe}, \texttt{GuardedNull}, \texttt{AllParameterised},
+\texttt{ConsTyped}/\texttt{NilTyped}) that are valid for any well-formed
+expression.  \texttt{composeJoin} does not introduce raw user input or
+untyped expressions.
+
+\textbf{L6 (cardinality):} \texttt{joinLimit}$(n_1, n_2) = \min(n_1, n_2)$,
+which is \texttt{Just} when both operands are.
+
+\textbf{L7--L10 (effects, temporal, linearity, epistemic):} Each annotation
+is combined by a monotone join operation (union of effects, intersection of
+version ranges, stricter linear bound, merged epistemic agent sets); the
+result is \texttt{Just} whenever both inputs are \texttt{Just}.
+
+The complete mechanised proof in Idris~2 is in
+\texttt{src/core/Composition.idr}; the level-by-level structure is
+documented in \texttt{docs/supplementary/composition-proof.adoc}.
 \end{proof}
 
 % ============================================================================
@@ -1472,9 +1491,11 @@ taxonomic contribution of this paper.
 \section{Formal Properties}\label{sec:formal}
 % ============================================================================
 
-We state several key properties of the \VCL{} type system.  Full
-proofs are mechanised in Idris\,2 and available in the supplementary
-material.
+We state several key properties of the \VCL{} type system.  The
+Composition Preservation theorem (Theorem~\ref{thm:composition}) is
+fully mechanised in Idris\,2 in \texttt{src/core/Composition.idr};
+the remaining proofs below are proof sketches that identify the
+key structure but are not yet mechanised end-to-end.
 
 \begin{theorem}[Type Soundness]
 If a \VCL{} query $q$ type-checks at safety level $k$, then
