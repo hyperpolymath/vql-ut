@@ -56,7 +56,7 @@ info:
 # INIT — Bootstrap a new project from this template
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Interactive project bootstrap — replaces all {{PLACEHOLDER}} tokens
+# Interactive project bootstrap — replaces all  tokens
 init:
     #!/usr/bin/env bash
     set -euo pipefail
