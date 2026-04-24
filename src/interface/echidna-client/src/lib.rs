@@ -132,6 +132,42 @@ pub mod wire {
         #[serde(skip_serializing_if = "Option::is_none")]
         pub confidence: Option<f32>,
     }
+
+    /// Cross-prover proof-exchange format. Mirrors
+    /// `echidna::interfaces::rest::models::ExchangeFormat`.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+    #[serde(rename_all = "snake_case")]
+    pub enum ExchangeFormat {
+        /// OpenTheory — HOL-family cross-checking.
+        OpenTheory,
+        /// Dedukti / Lambdapi — λΠ-calculus-modulo.
+        Dedukti,
+    }
+
+    /// Response body of `GET /api/v1/proofs/:id/export?format=...`.
+    /// `content` is the JSON-serialized article or module — typed
+    /// deserialization is the caller's choice.
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct ExportResponse {
+        pub format: ExchangeFormat,
+        pub content: serde_json::Value,
+    }
+
+    /// Body of `POST /api/v1/exchange/import`. `content` is a JSON-
+    /// serialized OpenTheoryArticle or DeduktiModule.
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct ImportRequest {
+        pub format: ExchangeFormat,
+        pub content: serde_json::Value,
+    }
+
+    /// Response body of `POST /api/v1/exchange/import`. `proof_state`
+    /// is the imported `ProofState` as JSON — round-trip tests compare
+    /// this against an independently-derived reference.
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub struct ImportResponse {
+        pub proof_state: serde_json::Value,
+    }
 }
 
 /// Client errors surfaced to callers. Wraps reqwest transport failures and
@@ -284,6 +320,45 @@ impl EchidnaClient {
         let resp = self
             .http
             .get(self.url(&format!("/api/v1/proofs/{}/tactics/suggest", id)))
+            .send()
+            .await?;
+        self.ok_or_err(resp).await?.json().await.map_err(Into::into)
+    }
+
+    /// GET /api/v1/proofs/:id/export?format=... — export a session's
+    /// current proof state to an OpenTheory article or Dedukti module.
+    /// Returned `content` is the exporter's serde-serialized output;
+    /// callers deserialize it into the concrete format type they need.
+    pub async fn export_proof(
+        &self,
+        id: &str,
+        format: wire::ExchangeFormat,
+    ) -> Result<wire::ExportResponse, ClientError> {
+        let slug = serde_json::to_string(&format)
+            .expect("ExchangeFormat serialization cannot fail")
+            .trim_matches('"')
+            .to_string();
+        let resp = self
+            .http
+            .get(self.url(&format!("/api/v1/proofs/{}/export", id)))
+            .query(&[("format", &slug)])
+            .send()
+            .await?;
+        self.ok_or_err(resp).await?.json().await.map_err(Into::into)
+    }
+
+    /// POST /api/v1/exchange/import — import an OpenTheory article or
+    /// Dedukti module and receive the resulting `ProofState` as JSON.
+    /// Stateless — does not create a session. Used by round-trip tests
+    /// and by clients with existing proof artefacts.
+    pub async fn import_proof(
+        &self,
+        req: &wire::ImportRequest,
+    ) -> Result<wire::ImportResponse, ClientError> {
+        let resp = self
+            .http
+            .post(self.url("/api/v1/exchange/import"))
+            .json(req)
             .send()
             .await?;
         self.ok_or_err(resp).await?.json().await.map_err(Into::into)
