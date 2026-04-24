@@ -15,11 +15,18 @@ struct Args {
     input: PathBuf,
 }
 
+const MAX_FILE_BYTES: u64 = 50 * 1024 * 1024; // 50 MiB guard against unbounded reads
+
 fn main() {
     let args = Args::parse();
 
     // Read the input file
     let input_path = args.input;
+    let meta = fs::metadata(&input_path).expect("Unable to stat file");
+    if meta.len() > MAX_FILE_BYTES {
+        eprintln!("error: input file exceeds 50 MiB limit ({} bytes)", meta.len());
+        std::process::exit(1);
+    }
     let content = fs::read_to_string(&input_path).expect("Unable to read file");
 
     // Lint the content

@@ -34,10 +34,9 @@ let safetyLevelNames = [
 
 /// Get the name of a safety level (0-9)
 let safetyLevelName = (level: int): string =>
-  if level >= 0 && level < 10 {
-    safetyLevelNames->Array.getUnsafe(level)
-  } else {
-    "Unknown"
+  switch safetyLevelNames->Array.get(level) {
+  | Some(name) => name
+  | None => "Unknown"
   }
 
 /// Whether a safety level is in the "established" tier (0-5)
