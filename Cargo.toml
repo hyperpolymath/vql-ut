@@ -28,6 +28,7 @@ members = [
     ".",
     "src/core",
     "src/interface",
+    "src/interface/echidna-client",
     "src/interface/fmt",
     "src/interface/lint",
     "src/interface/lsp",

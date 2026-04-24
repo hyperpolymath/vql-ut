@@ -1,0 +1,36 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+[package]
+name = "vcltotal-echidna-client"
+version = "0.1.0"
+edition = "2021"
+license = "PMPL-1.0-or-later"
+authors = ["Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"]
+repository = "https://github.com/hyperpolymath/vql-ut"
+description = "Async REST client for echidna proof engine (localhost:8000 by default)"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+# HTTP client — version pinned to match echidna's own reqwest so we never
+# fight two TLS stacks in one process.
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+
+# Serde matches echidna-core's choice.
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Error type.
+thiserror = "2"
+
+# Async runtime — only needed by the tests; `EchidnaClient` itself is
+# runtime-agnostic and works under any executor that drives reqwest.
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+
+# Shared proof-surface types (Term, Goal, ProofState, Tactic) via vcl-ut's
+# interface re-export layer. The `wire` module below redeclares REST-specific
+# envelope types (ProofRequest, ProofResponse, TacticRequest, TacticResponse)
+# because echidna's REST crate keeps those private to its bin target.
+[dependencies.vcltotal-interface]
+path = "../../interface"
