@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+#
+# echidnabot directive for the vcl-ut repo.
+#
+# Read by echidnabot's mode-resolver cascade
+# (see echidnabot/src/modes/directives.rs::resolve_mode).
+
+[metadata]
+version = "1.0.0"
+last-updated = "2026-04-25"
+
+[bot]
+# VCL-ut's anchor declares it owns canonical "Project semantics and
+# specification" + "Invariant definitions and contractiles". A proof
+# regression in vcl-ut is a contract violation — full Regulator with
+# strict (100%) threshold so any failed proof blocks the merge.
+mode = "regulator"
+
+[regulator]
+# Strict: every proof must pass. vcl-ut's proof surface is small
+# (formal proofs at docs/proofs/PROOFS.adoc, type-theory invariants),
+# so flake budget is unnecessary.
+coverage-threshold = 100  # percent; strict — every proof must pass
+
+[notes]
+# - vcl-ut is the canonical 10-level type-safety query language for
+#   VeriSimDB. A type-system regression here cascades into every
+#   downstream consumer that takes a VCL-ut query at face value.
+# - Threshold 100 may be relaxed in the future as vcl-ut grows a larger
+#   proof corpus where flake becomes statistically meaningful. Today
+#   the strict gate matches the project's invariant-bearing role.
